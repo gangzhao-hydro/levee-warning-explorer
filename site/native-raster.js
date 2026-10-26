@@ -53,11 +53,11 @@ window.NativeFlood = (() => {
     return promise;
   }
   function base(ctx,v,width,height){
-    ctx.fillStyle='#edf2f0';ctx.fillRect(0,0,width,height);ctx.fillStyle='#e0e7dc';
+    ctx.fillStyle='#0b1825';ctx.fillRect(0,0,width,height);ctx.fillStyle='#273c45';
     const sx=x=>(x-v.x)/v.w*width,sy=y=>(y-v.y)/v.h*height;
     for(const feature of land.features){const g=feature.geometry;if(!g)continue;const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
       for(const poly of polys){ctx.beginPath();for(const ring of poly){let previous=null;ring.forEach(([lon,lat],i)=>{const x=sx((lon+180)*120),y=sy((90-lat)*120);if(i===0||Math.abs(lon-previous)>180)ctx.moveTo(x,y);else ctx.lineTo(x,y);previous=lon;});ctx.closePath();}ctx.fill('evenodd');}}
-    ctx.strokeStyle='#c6d2c680';ctx.lineWidth=.5;const step=zoom<4?30:zoom<16?10:zoom<64?2:1;
+    ctx.strokeStyle='#7293a140';ctx.lineWidth=.5;const step=zoom<4?30:zoom<16?10:zoom<64?2:1;
     ctx.beginPath();for(let lon=-180;lon<=180;lon+=step){const px=(lon+180)*120;if(px<v.x||px>v.x+v.w)continue;ctx.moveTo(sx(px),0);ctx.lineTo(sx(px),height);}for(let lat=-90;lat<=90;lat+=step){const py=(90-lat)*120;if(py<v.y||py>v.y+v.h)continue;ctx.moveTo(0,sy(py));ctx.lineTo(width,sy(py));}ctx.stroke();
   }
   function rgba(values){
