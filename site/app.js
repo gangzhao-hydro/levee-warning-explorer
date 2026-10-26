@@ -127,19 +127,41 @@ function renderRates(d,b){
     vertical(p,b['toe_'+lev],C[lev],b['toe_'+lev]!==null?`${lev==='nolev'?'No':'With'}-levee ToE ${b['toe_'+lev]}`:'',lev==='wtlev'?14:0);
   }
 }
+function sampleWindow(p,start,kind,color,labelRow=0){
+  if(start===null)return null;
+  const end=Math.min(start+9,2100),x=p.x(start),width=p.x(end)-x,height=p.height-p.bottom-p.top;
+  const g=add(p.svg,'g',{'data-window':kind,'data-start':start,'data-end':end});
+  add(g,'title',{},`${kind} window: ${start}–${end}`);
+  add(g,'rect',{x,y:p.top,width,height,fill:color,opacity:kind==='RET'?.06:.12});
+  if(kind==='RET'){
+    const id=`${p.svg.id}-ret-hatch`,pattern=add(add(g,'defs'),'pattern',{id,width:6,height:6,patternUnits:'userSpaceOnUse'});
+    add(pattern,'path',{d:'M-1,1L1,-1M0,6L6,0M5,7L7,5',stroke:color,'stroke-width':1,opacity:.4});
+    add(g,'rect',{x,y:p.top,width,height,fill:`url(#${id})`});
+  }
+  add(g,'line',{x1:x,x2:x,y1:p.top,y2:p.height-p.bottom,stroke:color,'stroke-width':1,'stroke-dasharray':kind==='RET'?'2 3':'5 3'});
+  const nearRight=x>p.width-p.right-75;
+  return el('text',{x:x+(nearRight?-4:4),y:p.top+12+labelRow*15,'text-anchor':nearRight?'end':'start',style:`fill:${color};font-size:10px;font-weight:600;paint-order:stroke;stroke:white;stroke-width:3px;stroke-linejoin:round`},`${kind} ${start}`);
+}
+function sampleWindowKey(kind,start,color,hatched=false){
+  const label=start===null?`${kind}: not detected by 2100`:`${kind} window · ${start}–${Math.min(start+9,2100)}`;
+  return `<span><i aria-hidden="true" class="window-swatch${hatched?' hatched':''}${start===null?' not-detected':''}" style="--window-color:${color}"></i>${label}</span>`;
+}
 function renderSamples(d,b){
   if(!$('sampleNo')){
-    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas"></svg><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95. Missing source samples are omitted.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas"></svg><p class="note">Red dots exceed the historical no-levee maximum. The red band marks the shared RET window; RET requires at least two models.</p></article>';
+    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas" aria-describedby="sampleNoLegend"></svg><div id="sampleNoLegend" class="legend sample-window-legend" aria-label="No-levee detection window"></div><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95; dotted line: historical no-levee maximum. Blue shading marks the 10-year ToE window. Missing source samples are omitted.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas" aria-describedby="sampleWithLegend"></svg><div id="sampleWithLegend" class="legend sample-window-legend" aria-label="With-levee detection windows"></div><p class="note">Orange shading: 10-year ToE window. Purple hatching: shared 10-year RET window. Red dots exceed the historical no-levee maximum; RET requires at least two models within its window. Line: ensemble median. Dashed / dotted lines: historical P95 / maximum.</p></article>';
     $('rateChart').closest('article').after(container);
   }
   const ymax=Math.max(...d.nolev.samples_km2.flat().filter(v=>v!==null),...d.wtlev.samples_km2.flat().filter(v=>v!==null))*1.08;
   for(const lev of ['nolev','wtlev']){
     const p=chart(lev==='nolev'?'sampleNo':'sampleWith',{xmin:1970,xmax:2100,ymax,xticks:[1970,2015,2050,2100],width:500,height:300,yLabel:'Flooded area (km²)',xLabel:'Year'});
-    band(p,b['toe_'+lev],C[lev]);if(lev==='wtlev')band(p,b.ret,'#b94943');
+    const labels=[sampleWindow(p,b['toe_'+lev],'ToE',C[lev])];
+    if(lev==='wtlev')labels.push(sampleWindow(p,b.ret,'RET','#7656a5',1));
+    $(lev==='nolev'?'sampleNoLegend':'sampleWithLegend').innerHTML=sampleWindowKey('ToE',b['toe_'+lev],C[lev])+(lev==='wtlev'?sampleWindowKey('RET',b.ret,'#7656a5',true):'');
     d[lev].samples_km2.forEach((model,mi)=>model.forEach((value,i)=>{if(value===null)return;const record=lev==='wtlev'&&d.years[i]>=2015&&value>d.historical_max_km2;const point=add(p.svg,'circle',{cx:p.x(d.years[i]),cy:p.y(value),r:record?1.9:1.1,fill:record?'#b94943':value>d.p95_km2?C[lev]:'#89958d',opacity:record?.8:.3});add(point,'title',{},`${study.models[mi]}, ${d.years[i]}: ${fmt(value,2)} km²`);}));
     line(p,d.years,d[lev].median_km2,C[lev],{'stroke-width':1.5});
     for(const [value,color,dash] of [[d.p95_km2,'#c78b5a','5 4'],[d.historical_max_km2,'#555','2 3']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(value),y2:p.y(value),stroke:color,'stroke-width':.8,'stroke-dasharray':dash});
     vertical(p,2015,'#8c988f');
+    for(const label of labels)if(label)p.svg.append(label);
   }
 }
 function renderTimeline(b){
