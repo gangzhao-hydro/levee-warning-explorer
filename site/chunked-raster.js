@@ -18,7 +18,9 @@
         const response=await fetcher(new URL(meta.path,baseURL));
         if(response.status!==200){await response.body?.cancel();throw new Error(`Raster part: HTTP ${response.status}`);}
         const length=response.headers.get('content-length');
-        if(length!==null&&Number(length)!==expected){await response.body?.cancel();throw new Error('Raster part size mismatch.');}
+        const encoding=response.headers.get('content-encoding');
+        // Fetch decodes CDN gzip/br bodies; Content-Length still counts wire bytes.
+        if((!encoding||encoding==='identity')&&length!==null&&Number(length)!==expected){await response.body?.cancel();throw new Error('Raster part size mismatch.');}
         const reader=response.body.getReader(),data=new Uint8Array(expected);let offset=0;
         while(true){const {done,value}=await reader.read();if(done)break;if(offset+value.length>expected){await reader.cancel();throw new Error('Raster part exceeds its declared size.');}data.set(value,offset);offset+=value.length;}
         if(offset!==expected)throw new Error('Incomplete raster part.');
