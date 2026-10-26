@@ -1,0 +1,17 @@
+{
+  "base_url": "rasters/chunks/",
+  "local_base_url": "raster-data/cog/",
+  "years": [
+    2000
+  ],
+  "grid": {
+    "width": 43200,
+    "height": 21600,
+    "west": -180,
+    "north": 90,
+    "pixel_degrees": 0.008333333333333333
+  },
+  "filename_template": "{layer}-{year}.tif",
+  "default_year": 2000,
+  "chunk_manifest": "rasters/chunks/manifest.json"
+}
