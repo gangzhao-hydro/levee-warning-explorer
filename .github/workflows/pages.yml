@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['site/**', 'deploy/**', '.github/workflows/pages.yml']
+    paths: ['site/**', 'deploy/**', 'tests/**', '.github/workflows/pages.yml']
 permissions:
   contents: read
   pages: write
@@ -19,6 +19,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Test raster reader
+        run: node tests/chunked-raster.cjs
       - name: Download verified 2000 dataset and site assets
         env:
           GH_TOKEN: ${{ github.token }}
