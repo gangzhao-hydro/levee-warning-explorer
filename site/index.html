@@ -5,7 +5,7 @@
   <meta name="description" content="Explore three results on levees, flood exposure, hazard emergence and statistical warning across 426 river sub-basins.">
   <meta name="theme-color" content="#ffffff">
   <title>Levees & the warning gap · Research explorer</title>
-  <link rel="stylesheet" href="styles.css?v=614c0783aaff">
+  <link rel="stylesheet" href="styles.css?v=9f1c894e7109">
 </head>
 <body>
 <a class="skip" href="#main">Skip to results</a>
@@ -18,7 +18,24 @@
       <div class="identity-cell"><span class="utokyo-frame"><img class="utokyo-logo" src="assets/identity/utokyo.png" alt="UTokyo · The University of Tokyo"></span></div>
       <div class="identity-cell"><img class="science-logo" src="assets/identity/science-tokyo.svg" alt="Institute of Science Tokyo"></div>
       <div class="identity-cell sit-logo"><span class="sit-emblem" aria-hidden="true"><img src="assets/identity/shibaura.png" alt=""></span><span class="sit-wordmark"><strong>SHIBAURA</strong><small>INSTITUTE OF<br>TECHNOLOGY</small></span></div>
-      <div class="identity-cell model-logo"><span class="model-symbol" aria-hidden="true"><img src="assets/identity/cama-flood-illustration.png" alt=""><svg class="model-water" viewBox="0 0 1536 1024" focusable="false"><polygon fill="#45aee6" fill-opacity=".62" points="360,525 745,228 745,228 360,525"><animate attributeName="points" dur="9s" repeatCount="indefinite" keyTimes="0;.16;.48;.6;.9;1" values="360,525 745,228 745,228 360,525;360,525 745,228 745,228 360,525;360,525 745,228 508,190 108,486;360,525 745,228 508,190 108,486;360,525 745,228 745,228 360,525;360,525 745,228 745,228 360,525"/></polygon><polygon fill="#45aee6" fill-opacity=".62" points="785,596 1148,281 1148,281 785,596"><animate attributeName="points" dur="9s" repeatCount="indefinite" keyTimes="0;.16;.48;.6;.9;1" values="785,596 1148,281 1148,281 785,596;785,596 1148,281 1148,281 785,596;785,596 1148,281 1430,320 1062,640;785,596 1148,281 1430,320 1062,640;785,596 1148,281 1148,281 785,596;785,596 1148,281 1148,281 785,596"/></polygon></svg></span><span class="model-copy"><strong>CaMa-Flood</strong><small>River &amp; floodplain model</small></span></div>
+      <div class="identity-cell model-logo"><span class="model-symbol" aria-hidden="true"><svg class="model-hydro" viewBox="0 0 220 150" focusable="false">
+          <defs>
+            <linearGradient id="cama-water-surface" x1="0" y1="0" x2="0.7" y2="1"><stop stop-color="#83e5ef"/><stop offset="1" stop-color="#299bd4"/></linearGradient>
+            <linearGradient id="cama-water-depth" x2="0" y2="1"><stop stop-color="#26acd9"/><stop offset="1" stop-color="#1266a6"/></linearGradient>
+          </defs>
+          <g stroke="#285d67" stroke-width="2.2" stroke-linejoin="round">
+            <path fill="#dce9e1" d="M130 102 206 43 206 78 130 137Z"/>
+            <path fill="#e6e3d5" d="M10 78 50 86 64 115 89 120 104 97 130 102 130 137 10 113Z"/>
+            <path fill="#c3d6cd" d="M50 86 126 27 140 56 64 115Z"/>
+            <path fill="#d3e0d4" d="M89 120 165 61 180 38 104 97Z"/>
+            <path fill="#adbdb0" d="M64 115 140 56 165 61 89 120Z"/>
+            <path fill="#b8dfca" d="M10 78 86 19 126 27 50 86Z"/>
+            <path fill="#c9e8d7" d="M104 97 180 38 206 43 130 102Z"/>
+          </g>
+          <g class="model-hydro-live"><polygon points="59,107 96,114 172,55 135,48" fill="url(#cama-water-surface)"><animate attributeName="points" dur="10s" repeatCount="indefinite" keyTimes="0;.10;.32;.48;.58;.74;.94;1" values="59,107 96,114 172,55 135,48;59,107 96,114 172,55 135,48;50,86 104,97 180,38 126,27;20,72 123,93 199,34 96,13;20,72 123,93 199,34 96,13;50,86 104,97 180,38 126,27;59,107 96,114 172,55 135,48;59,107 96,114 172,55 135,48"/></polygon><polygon points="59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107" fill="url(#cama-water-depth)"><animate attributeName="points" dur="10s" repeatCount="indefinite" keyTimes="0;.10;.32;.48;.58;.74;.94;1" values="59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107;59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107;50,86 104,97 104,97 104,97 89,120 64,115 50,86 50,86;20,72 123,93 123,101 104,97 89,120 64,115 50,86 20,80;20,72 123,93 123,101 104,97 89,120 64,115 50,86 20,80;50,86 104,97 104,97 104,97 89,120 64,115 50,86 50,86;59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107;59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107"/></polygon></g>
+          <g class="model-hydro-still"><polygon points="59,107 96,114 172,55 135,48" fill="url(#cama-water-surface)"></polygon><polygon points="59,107 96,114 96,114 96,114 89,120 64,115 59,107 59,107" fill="url(#cama-water-depth)"></polygon></g>
+          <path d="M10 78 50 86 64 115 89 120 104 97 130 102" fill="none" stroke="#285d67" stroke-width="2.2" stroke-linejoin="round"/>
+        </svg></span><span class="model-copy"><strong>CaMa-Flood</strong><small>River &amp; floodplain model</small></span></div>
     </div>
   </aside>
 </div>
