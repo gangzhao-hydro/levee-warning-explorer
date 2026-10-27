@@ -126,3 +126,26 @@ select, input:not([type=range]):not([type=checkbox]) { border-color: #cbdedb; bo
   .legend { font-size: 10px; }
   .disclosure > summary, .paper-figure > summary { font-size: 13px; }
 }
+
+/* Institutional marks and the custom river-model illustration in the hero. */
+.identity-panel { min-width: 0; padding: 17px 20px 15px; border: 1px solid #dfeae7; border-radius: 14px; background: #fbfdfc; }
+.identity-heading { margin: 0 0 8px; color: #70888b; font: 10px/1.4 var(--mono); letter-spacing: .09em; }
+.identity-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.identity-cell { min-width: 0; min-height: 82px; display: flex; align-items: center; justify-content: center; padding: 10px 12px; text-decoration: none; }
+.identity-cell:nth-child(odd) { border-right: 1px solid #e6efed; }
+.identity-cell:nth-child(-n+2) { border-bottom: 1px solid #e6efed; }
+.identity-cell img { display: block; max-width: 100%; max-height: 68px; object-fit: contain; }
+.identity-cell .science-logo { width: 190px; }
+.institution-name { color: #314c5c; font: 600 16px/1.15 Georgia, serif; text-align: center; }
+.sit-logo { gap: 8px; color: #285a4e; }
+.sit-emblem { display: block; position: relative; overflow: hidden; width: 38px; height: 40px; flex: 0 0 38px; }
+.identity-cell .sit-emblem img { position: absolute; left: -87px; top: -22px; width: 210px; height: auto; max-width: none; max-height: none; }
+.sit-wordmark strong { display: block; color: #254f43; font-size: 11px; letter-spacing: .04em; line-height: 1.2; }
+.sit-wordmark small { display: block; margin-top: 3px; color: #536f6a; font-size: 8px; letter-spacing: .035em; line-height: 1.3; }
+.model-logo { gap: 7px; color: #205c68; }
+.model-logo img { width: 76px; height: 62px; flex: 0 0 76px; }
+.model-logo span { min-width: 0; }
+.model-logo strong { display: block; font-size: 15px; letter-spacing: -.03em; white-space: nowrap; }
+.model-logo small { display: block; margin-top: 4px; color: #6f8589; font-size: 9px; line-height: 1.4; }
+@media (max-width: 800px) { .identity-panel { padding: 13px; }.identity-cell { padding: 8px; min-height: 73px; }.identity-cell img { max-height: 58px; }.institution-name { font-size: 14px; }.model-logo img { width: 60px; height: 50px; flex-basis: 60px; }.model-logo strong { font-size: 13px; } }
+@media (max-width: 600px) { .identity-panel { margin-top: 24px; padding: 12px 14px; }.identity-heading { font-size: 9px; }.identity-cell { min-height: 68px; }.identity-cell img { max-height: 54px; }.model-logo img { width: 55px; height: 46px; flex-basis: 55px; }.model-logo small { font-size: 9px; } }
