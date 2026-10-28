@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Explore three results on levees, flood exposure, hazard emergence and statistical warning across 426 river sub-basins.">
+  <meta name="description" content="Understand how levees affect flood exposure and detectable warning, then look up results for 426 river sub-basins by map, coordinates or study ID.">
   <meta name="theme-color" content="#ffffff">
   <title>Levees reduce flood exposure but obscure river-flood emergence · Research explorer</title>
-  <link rel="stylesheet" href="styles.css?v=9f1c894e7109">
+  <link rel="stylesheet" href="styles.css?v=reader1">
 </head>
-<body>
-<a class="skip" href="#main">Skip to results</a>
-<header class="masthead"><a class="brand" href="#exposure"><svg class="brand-icon" viewBox="0 0 36 36" aria-hidden="true"><path d="M7 5L18 16V31M29 5L18 16M5 18L18 25M31 17L18 25"/></svg><span>RIVER SYSTEMS<span class="brand-sub">RESEARCH EXPLORER</span></span></a><span class="edition">A manuscript companion</span></header>
+<body data-page="overview">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead"><a class="brand" href="#overview"><svg class="brand-icon" viewBox="0 0 36 36" aria-hidden="true"><path d="M7 5L18 16V31M29 5L18 16M5 18L18 25M31 17L18 25"/></svg><span>RIVER SYSTEMS<span class="brand-sub">RESEARCH EXPLORER</span></span></a><span class="edition">A manuscript companion</span></header>
 <div class="intro">
-  <div class="intro-content"><p class="eyebrow">FLOOD PROTECTION & A CHANGING CLIMATE</p><h1>Levees reduce flood exposure<br><em>but obscure river-flood emergence.</em></h1><p class="intro-copy">Three results on flood exposure, hazard emergence and the time left to respond.</p></div>
+  <div class="intro-content"><p class="eyebrow">FLOOD PROTECTION & A CHANGING CLIMATE</p><h1>Levees reduce flood exposure<br><em>but obscure river-flood emergence.</em></h1><p class="intro-copy">Protection reduces flooding. It can also make a changing flood hazard harder to detect. Explore the evidence, then look up a river basin.</p><div class="reader-actions"><a class="reader-button" href="#overview">Understand the paper ↓</a><a class="reader-button secondary" href="#basins">Find a basin ↗</a></div></div>
   <aside class="identity-panel" aria-label="Institutions and flood model">
     <p class="identity-heading">INSTITUTIONS &amp; MODEL</p>
     <div class="identity-grid">
@@ -40,6 +40,8 @@
   </aside>
 </div>
 <nav class="tabs" aria-label="Research results">
+  <a href="#overview" data-tab="overview">Start here</a>
+  <a href="#basins" data-tab="basins">Find a basin</a>
   <a href="#exposure" data-tab="exposure"><span>01</span> Population exposure</a>
   <a href="#emergence" data-tab="emergence"><span>02</span> Hazard emergence</a>
   <a href="#warning" data-tab="warning"><span>03</span> Warning time</a>
@@ -47,6 +49,31 @@
 </nav>
 <main id="main">
 <div id="status" role="status">Loading the manuscript source data…</div>
+
+<section id="overview" class="page reader-page" hidden>
+  <div class="reader-heading"><p class="eyebrow">THE PAPER IN THREE FINDINGS</p><h2>Less flooding does not always mean an unchanged hazard.</h2><p>We compare the same river systems with and without levees. This separates the benefits of protection from its effect on the signals used to detect a changing flood hazard.</p></div>
+  <div class="finding-grid">
+    <a class="finding" href="#exposure"><span class="eyebrow">01 · EXPOSURE</span><strong id="storyReduction">—</strong><h3>Levees reduce exposure</h3><p>Relative reduction in historical modelled population exposure. Population is held fixed at its 2020 distribution.</p><span class="finding-link">Explore population exposure →</span></a>
+    <a class="finding" href="#emergence"><span class="eyebrow">02 · DETECTABILITY</span><strong id="storyMasked">—</strong><h3>Some signals become undetectable</h3><p>Out of 426 basins, emergence is detected without levees but not with levees by 2100 under SSP5-8.5.</p><span class="finding-link">Explore hazard emergence →</span></a>
+    <a class="finding" href="#warning"><span class="eyebrow">03 · STATISTICAL LEAD</span><strong id="storyLead">—</strong><h3>Less lead before record exceedance</h3><p>Median lead time without → with levees, using the same 195 basins with all three timings detected.</p><span class="finding-link">Explore warning time →</span></a>
+  </div>
+  <div class="reader-heading"><p class="eyebrow">TWO CLOCKS, ONE COMPARISON</p><h2>What do ToE and RET mean?</h2></div>
+  <div class="definition-grid"><article><span class="term">ToE</span><h3>When does the change become detectable?</h3><p><strong>Time of emergence</strong> is the start of the first ten-year window in which historically large inundations become sufficiently frequent to pass the detection criteria. It is calculated separately with and without levees.</p></article><article><span class="term">RET</span><h3>When is the historical record exceeded?</h3><p><strong>Record-exceedance time</strong> is the start of the first ten-year window in which at least two models exceed the historical no-levee maximum under protection. The same RET is used in both comparisons.</p></article></div>
+  <div class="lead-equation"><strong>Lead time = RET − ToE</strong><span>Positive: detectable signal first</span><span>Zero: the same window start</span><span>Negative: record exceedance first</span></div>
+  <article class="card story-example"><div class="card-top"><div><p class="eyebrow">WORKED EXAMPLE · FIGURE 1</p><h3>Follow the two clocks in the Songhua River basin</h3><p>Basin 118 · SSP5-8.5 · historical P95 · RET ≥2 models</p></div><div class="story-switch" role="group" aria-label="Songhua protection state"><button type="button" data-story-state="nolev" aria-pressed="true">Without levees</button><button type="button" data-story-state="wtlev" aria-pressed="false">With levees</button></div></div><div class="story-events" id="storyEvents"></div><p id="storyExplanation" class="story-explanation" aria-live="polite"></p><p class="note">Dates mark ten-year window starts, not forecasts of individual flood events. This basin illustrates the mechanism; the global results summarize all 426 basins.</p><a class="text-link" href="#basins?basin=118">Inspect this basin and its source data →</a></article>
+  <div class="reading-boundary"><h3>How to read the findings</h3><p>These are decadal statistical signals, not operational flood forecasts. “Not detected by 2100” does not mean no flood risk. Lead-time curves include only basins where both ToEs and the shared RET are detected; the full-domain classifications also retain the other basins.</p></div>
+  <details class="disclosure"><summary><span>Study design at a glance<small>Scenarios, comparison domain and assumptions</small></span></summary><div class="detail-body scope-grid"><p><strong>426 river sub-basins</strong><br>The same analysis domain in both protection states; basin area ≥1,000 km².</p><p><strong>11 CMIP6 models</strong><br>Historical 1970–2014 and future 2015–2100. SSP1-2.6 global exposure uses 10 available models.</p><p><strong>Fixed protection and population</strong><br>The comparison isolates hazard-driven changes under the study assumptions.</p><p><strong>A separate historical map</strong><br>The 2000 map is a VIC hindcast. It is not a CMIP6 ensemble result.</p></div></details>
+  <a class="reader-button" href="#basins">Find a basin of interest →</a>
+</section>
+<section id="basins" class="page basin-browser" hidden>
+  <div class="reader-heading"><p class="eyebrow">EXPLORE YOUR RIVER SYSTEM</p><h2>Find a basin. Understand its result.</h2><p>Search an analysis ID, select a mapped basin, or locate a point by longitude and latitude. Every result below uses SSP5-8.5, historical P95 and the ≥2-model RET criterion.</p></div>
+  <div class="lookup-forms"><form id="basinLookup"><label for="basinQuery">Basin ID or verified name</label><div><input id="basinQuery" placeholder="e.g. 118 or Songhua" autocomplete="off"><button class="reader-button" type="submit">Find basin</button></div><p class="note">Name lookup currently covers Songhua / 松花江. All 426 basins are searchable by ID.</p></form><form id="pointLookup"><span class="lookup-label">Locate by coordinates</span><div><label for="pointLon">Longitude<input id="pointLon" type="number" min="-180" max="180" step="any" placeholder="e.g. 126.6" required></label><label for="pointLat">Latitude<input id="pointLat" type="number" min="-90" max="90" step="any" placeholder="e.g. 45.8" required></label><button class="reader-button secondary" type="submit">Locate point</button></div><p class="note">Uses simplified study boundaries. Near a boundary, verify the highlighted basin; an unmatched point is not assigned to the nearest basin.</p></form></div>
+  <p id="lookupStatus" class="lookup-status" role="status"></p>
+  <article class="card"><div class="card-top"><div><h3>Select a basin on the map</h3><p>Colours show whether emergence is detected in both protection states.</p></div><button id="locatorReset" class="quiet" type="button">Show all basins</button></div><svg id="basinLocator" class="world-map" viewBox="0 14 1000 410" role="group" aria-label="Select from the 426 study basins"></svg><div id="locatorLegend" class="legend"></div></article>
+  <article id="basinReport" class="card basin-report" aria-labelledby="basinReportTitle"><div class="card-top"><div><p class="eyebrow">SELECTED BASIN</p><h3 id="basinReportTitle"></h3><p id="basinReportMeta"></p></div><button id="copyBasinReport" class="quiet" type="button">Copy basin link</button></div><div id="basinReportNumbers" class="basin-detail"></div><p id="basinInterpretation" class="story-explanation"></p><div class="table-scroll"><table id="basinComparison"></table></div><p id="basinSupport" class="note"></p><div class="reader-actions"><a id="reportDetection" class="reader-button secondary">View detection curves →</a><a id="reportWarning" class="reader-button secondary">View warning timeline →</a><button id="downloadBasinReport" class="quiet" type="button">Download this basin’s data ↓</button></div></article>
+  <details class="disclosure"><summary><span>Browse the complete basin directory<small>Filter, sort and compare all 426 basins</small></span></summary><div class="detail-body"><div class="directory-controls"><label>With-levee warning class<select id="basinClassFilter"><option value="all">All classes</option></select></label><label>Sort by<select id="basinSort"><option value="id">Basin ID</option><option value="area">Largest area first</option><option value="lead">Shortest with-levee lead first</option></select></label><p id="directoryCount" role="status"></p></div><div class="table-scroll"><table id="basinDirectory"></table></div><div class="directory-pagination"><button id="directoryPrev" class="quiet" type="button">Previous</button><span id="directoryPage"></span><button id="directoryNext" class="quiet" type="button">Next</button></div></div></details>
+</section>
+
 <section id="exposure" class="page result-page" hidden>
   <div class="section-title"><div><p class="eyebrow">01 / POPULATION EXPOSURE</p><h2>Lower exposure. A persistent upward trajectory.</h2></div></div>
   <p class="lede">Levees reduce modelled exposure, while warming continues to raise it. Population is held fixed at its 2020 distribution.</p>
@@ -117,5 +144,5 @@
 </main>
 <div id="tooltip" role="tooltip" hidden></div>
 <noscript>This explorer requires JavaScript. Source CSV files remain available in the downloads folder.</noscript>
-<script src="vendor/geotiff.js" defer></script><script src="chunked-raster.js" defer></script><script src="native-raster.js?v=1d2e7d7ff3f5" defer></script><script src="app.js?v=corrected-20261028" defer></script>
+<script src="vendor/geotiff.js" defer></script><script src="chunked-raster.js" defer></script><script src="native-raster.js?v=1d2e7d7ff3f5" defer></script><script src="basin-lookup.js?v=reader1" defer></script><script src="app.js?v=reader1" defer></script><script src="reader.js?v=reader1" defer></script>
 </body></html>

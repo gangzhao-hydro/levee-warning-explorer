@@ -30,6 +30,8 @@ jobs:
           python3 deploy/assemble.py "$RUNNER_TEMP/site-data/site-2000.zip" _site
       - name: Validate corrected manuscript results
         run: python3 tests/scientific-data.py _site
+      - name: Validate basin search and coordinate lookup
+        run: node tests/basin-lookup.cjs _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
