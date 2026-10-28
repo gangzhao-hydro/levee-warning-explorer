@@ -32,3 +32,17 @@ python3 -m http.server 4173 --bind 127.0.0.1 --directory _site
 ```
 
 Open http://127.0.0.1:4173/ . The chunked map works on an ordinary static server and does not require HTTP Range support.
+
+## Corrected manuscript results — 28 October 2026
+
+The current title is **Levees reduce flood exposure but obscure river-flood emergence**.
+Results use the verified corrected lookup, corrected cell-area aggregation, VIC runoff mask (18.25 mm yr⁻¹), and positive-exceedance guard. The 426-basin domain is unchanged. Figures 1–4 use the current manuscript numbering.
+
+- P95 / SSP5-8.5: detected ToE 328 → 222; 107 masked; 120 delayed.
+- Shared protected-system RET: 234 detections. Both lead-time distributions use exactly the same 195 basins: medians 6 → 0 years.
+- Full-domain warning classes and common-support lead distributions have different denominators and are labelled separately.
+- SSP1-2.6 global exposure uses its 10 available models; other scenarios and the historical baseline use 11.
+
+The original release `v1.0.0` remains an immutable source of the already-public 2000 VIC maps and dependencies. `deploy/corrected-results/` contains checksum-verified parts of a ZIP overlay with updated aggregate data, basin series, CSV downloads and figure previews. Assembly verifies each part, the combined archive, and all original map chunks. No new full-resolution CMIP6 rasters are published.
+
+Rebuild the scientific overlay with `deploy/build_corrected_data.py --project <reference-project> --corrected <verified-corrected-root>` in the production analysis Python environment. The builder verifies every one of 852 P95 ToE values and 426 shared RET values before display rounding. Current provenance is published in `data/provenance.json`.

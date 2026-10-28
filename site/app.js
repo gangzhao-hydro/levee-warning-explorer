@@ -159,7 +159,7 @@ function sampleWindowKey(kind,start,color,hatched=false){
 }
 function renderSamples(d,b){
   if(!$('sampleNo')){
-    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas" aria-describedby="sampleNoLegend"></svg><div id="sampleNoLegend" class="legend sample-window-legend" aria-label="No-levee detection window"></div><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95; dotted line: historical no-levee maximum. Blue shading marks the 10-year ToE window. Missing source samples are omitted.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas" aria-describedby="sampleWithLegend"></svg><div id="sampleWithLegend" class="legend sample-window-legend" aria-label="With-levee detection windows"></div><p class="note">Orange shading: 10-year ToE window. Purple hatching: shared 10-year RET window. Red dots exceed the historical no-levee maximum; RET requires at least two models within its window. Line: ensemble median. Dashed / dotted lines: historical P95 / maximum.</p></article>';
+    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas" aria-describedby="sampleNoLegend"></svg><div id="sampleNoLegend" class="legend sample-window-legend" aria-label="No-levee detection window"></div><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95; dotted line: historical no-levee maximum. Blue shading marks the 10-year ToE window. Zero inundation is retained; no missing samples in the corrected series.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas" aria-describedby="sampleWithLegend"></svg><div id="sampleWithLegend" class="legend sample-window-legend" aria-label="With-levee detection windows"></div><p class="note">Orange shading: 10-year ToE window. Purple hatching: shared 10-year RET window. Red dots exceed the historical no-levee maximum; RET requires at least two models within its window. Line: ensemble median. Dashed / dotted lines: historical P95 / maximum.</p></article>';
     $('sampleCharts').append(container);
   }
   const ymax=Math.max(...d.nolev.samples_km2.flat().filter(v=>v!==null),...d.wtlev.samples_km2.flat().filter(v=>v!==null))*1.08;
@@ -189,11 +189,12 @@ function renderTimeline(b){
   else add(p.svg,'text',{x:p.left,y:27},'Shared RET not detected by 2100');
 }
 function renderLead(){
-  const values=study.basins.flatMap(b=>[b.lead_nolev,b.lead_wtlev]).filter(v=>v!==null);
+  const common=study.basins.filter(b=>b.lead_nolev!==null&&b.lead_wtlev!==null);
+  const values=common.flatMap(b=>[b.lead_nolev,b.lead_wtlev]).filter(v=>v!==null);
   const xmin=Math.floor(Math.min(...values)/20)*20,xmax=Math.ceil(Math.max(...values)/20)*20;
   const p=chart('leadChart',{xmin,xmax,ymax:100,xticks:Array.from({length:(xmax-xmin)/20+1},(_,i)=>xmin+i*20),width:500,height:320,yLabel:'Cumulative share (%)',xLabel:'Warning lead (years)'});
   add(p.svg,'rect',{x:p.x(xmin),y:p.top,width:p.x(0)-p.x(xmin),height:320-p.top-p.bottom,fill:'#bb6261',opacity:.045});vertical(p,0,'#a5afa7');
-  for(const lev of ['nolev','wtlev']){const v=study.basins.map(b=>b['lead_'+lev]).filter(v=>v!==null).sort((a,b)=>a-b);let points=`M${p.x(xmin)},${p.y(0)}`;v.forEach((value,i)=>points+=`H${p.x(value)}V${p.y((i+1)/v.length*100)}`);points+=`H${p.x(xmax)}`;add(p.svg,'path',{d:points,stroke:C[lev],class:'main-line','stroke-dasharray':lev==='wtlev'?'6 4':'none'});}
+  for(const lev of ['nolev','wtlev']){const v=common.map(b=>b['lead_'+lev]).filter(v=>v!==null).sort((a,b)=>a-b);let points=`M${p.x(xmin)},${p.y(0)}`;v.forEach((value,i)=>points+=`H${p.x(value)}V${p.y((i+1)/v.length*100)}`);points+=`H${p.x(xmax)}`;add(p.svg,'path',{d:points,stroke:C[lev],class:'main-line','stroke-dasharray':lev==='wtlev'?'6 4':'none'});}
 }
 function renderTables(){
   const scenarioNames={historical:'Historical',ssp126:'SSP1-2.6',ssp245:'SSP2-4.5',ssp585:'SSP5-8.5'};
@@ -247,10 +248,10 @@ async function init(){
     const h=exposure.periods.historical, reduction=(h.nolev-h.wtlev)/100*exposure.population/1e6;
     $('exposureMetrics').innerHTML=metric(`${fmt(h.nolev,2)} → ${fmt(h.wtlev,2)}%`,'Historical exposed share','No levees → with levees · 1970–2014');
     $('exposureExtraMetrics').innerHTML=metric(`−${fmt(reduction)}m`,'People exposed','Approximate reduction under fixed 2020 population')+metric('28%','Relative exposure reduction','Existing levees, historical ensemble mean');
-    $('emergenceMetrics').innerHTML=metric('327 → 216','Basins with detected ToE','No levees → with levees · out of 426');
-    $('emergenceExtraMetrics').innerHTML=metric('112','Levee-masked ToEs','No-levee detection; with-levee non-detection')+metric('215','Basins detected in both states','Including 23 with an earlier with-levee ToE');
-    $('warningMetrics').innerHTML=metric('7 → 0 yr','Median statistical warning lead','No levees → with levees · paired samples n = 221 / 192');
-    $('warningExtraMetrics').innerHTML=metric('24% → 42%','RET precedes detectable ToE','Within each paired sample; RET-only cases excluded')+metric('233','Shared RET detections','One protected-system RET per basin');
+    $('emergenceMetrics').innerHTML=metric(`${study.summary.detected_nolev} → ${study.summary.detected_wtlev}`,'Basins with detected ToE','No levees → with levees · out of 426');
+    $('emergenceExtraMetrics').innerHTML=metric(study.summary.masked,'Levee-masked ToEs','No-levee detection; with-levee non-detection')+metric(study.summary.both,'Basins detected in both states','Including 21 with an earlier with-levee ToE');
+    $('warningMetrics').innerHTML=metric(`${study.summary.nolev.median_lead} → ${study.summary.wtlev.median_lead} yr`,'Median statistical warning lead','No levees → with levees · same common-support sample, n = 195');
+    $('warningExtraMetrics').innerHTML=metric(`${fmt(study.summary.nolev.surprise_paired_percent,1)}% → ${fmt(study.summary.wtlev.surprise_paired_percent,1)}%`,'RET precedes detectable ToE','Within the same 195 basins; RET-only cases excluded')+metric(study.summary.ret_detected,'Shared RET detections','One protected-system RET per basin');
     const options=study.basins.map(b=>`<option value="${b.basin_id}">Basin ${b.basin_id}</option>`).join('');$('toeBasin').innerHTML=options;$('warningBasin').innerHTML=options;
     $('status').hidden=true;renderDomain();renderExposure();renderTables();renderLead();activate();selectBasin(selected,false);installExplorerTools();
     $('scenario').addEventListener('change',renderExposure);$('individualModels').addEventListener('change',renderExposure);

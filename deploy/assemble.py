@@ -2,6 +2,7 @@
 """Verify the release asset, assemble static files, and apply reviewed frontend edits."""
 from pathlib import Path, PurePosixPath
 import hashlib
+import io
 import json
 import shutil
 import sys
@@ -21,6 +22,24 @@ with zipfile.ZipFile(asset) as archive:
         p = PurePosixPath(name)
         assert not p.is_absolute() and '..' not in p.parts, 'Invalid archive path'
     archive.extractall(output)
+# Verified corrected aggregate results overlay the unchanged VIC-2000 release.
+parts_root = ROOT/'deploy/corrected-results'
+corrected_manifest = json.loads((parts_root/'manifest.json').read_text())
+chunks = []
+for entry in corrected_manifest['parts']:
+    data = (parts_root/entry['path']).read_bytes()
+    assert len(data) == entry['bytes']
+    assert hashlib.sha256(data).hexdigest() == entry['sha256']
+    chunks.append(data)
+corrected = b''.join(chunks)
+assert len(corrected) == corrected_manifest['bytes']
+assert hashlib.sha256(corrected).hexdigest() == corrected_manifest['sha256']
+with zipfile.ZipFile(io.BytesIO(corrected)) as archive:
+    for name in archive.namelist():
+        p = PurePosixPath(name)
+        assert not p.is_absolute() and '..' not in p.parts
+        assert p.parts[0] in {'data','figures','downloads'}
+    archive.extractall(output)
 shutil.copytree(ROOT/'site', output, dirs_exist_ok=True)
 config = json.loads((output/'rasters/native-config.json').read_text())
 assert config['years'] == [2000] and config['chunk_manifest']
@@ -38,4 +57,8 @@ files = [p for p in output.rglob('*') if p.is_file()]
 assert (output/'index.html').is_file()
 assert sum(p.stat().st_size for p in files) < 1_000_000_000
 assert max(p.stat().st_size for p in files) <= 4*1024**2
+study = json.loads((output/'data/study.json').read_text())
+assert study['version'] == 'corrected-lookup-area-P99guard-20261028'
+assert study['summary']['nolev']['paired'] == study['summary']['wtlev']['paired'] == 195
+assert study['summary']['masked'] == 107
 print(f'Verified {len(files)} static files, 426 basins, 2000 at original 30 arcseconds.')
