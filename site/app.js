@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
 const C = {nolev:'#267fa0',wtlev:'#bd6843',ink:'#233b43',teal:'#217b78'};
 const categories = ['Advance warning','Surprise','Undetected surprise','Emergence without exceedance','Neither'];
-const catColors = {'Advance warning':'#5d9e8c','Surprise':'#bb6261','Undetected surprise':'#bd8d3d','Emergence without exceedance':'#8065ab','Neither':'#c9d3d5'};
+const catColors = {'Advance warning':'#5d9e8c','Surprise':'#bd8d3d','Undetected surprise':'#bb6261','Emergence without exceedance':'#8065ab','Neither':'#c9d3d5'};
 const catShort = {'Advance warning':'Advance warning','Surprise':'Surprise','Undetected surprise':'Undetected surprise','Emergence without exceedance':'Emergence only','Neither':'Neither'};
 let study, exposure, geometries, land, basins, activeTab='overview', selected=118, detailToken=0, rasterToken=0;
 const mapViews={toe:[0,14,1000,410],warning:[0,14,1000,410]};
@@ -119,7 +119,6 @@ function selectBasin(id,updateURL=true){
   if(updateURL){history.replaceState(null,'',`#${activeTab}?basin=${selected}&view=basin`);openBasinDetail();}
   for(const prefix of ['toe','warning'])$(prefix+'DrilldownTitle').textContent=`Explore basin ${selected}`;
   renderMap('toe');renderMap('warning');renderTimeline(b);loadDetail(b);
-  if(window.ReaderCompanion)window.ReaderCompanion.sync();
 }
 async function loadDetail(b){
   const token=++detailToken;$('rateLoading').textContent=`Loading basin ${b.basin_id}…`;$('rateChart').replaceChildren();
@@ -206,15 +205,13 @@ function renderTables(){
   table('transitionTable',['From ↓ / To →',...categories.map(c=>catShort[c]),'Total'],categories.map(a=>[catShort[a],...categories.map(b=>{const n=transitions.get(a+'|'+b)??0;return `<span style="display:block;padding:5px;background:rgba(38,127,160,${n?Math.max(.06,n/180*.35):0});border-radius:3px">${n||'—'}</span>`;}),study.summary.nolev.categories[a]]));
 }
 function activate(){
-  const [tab,query='']=location.hash.slice(1).split('?');activeTab=['overview','basins','exposure','emergence','warning','historical'].includes(tab)?tab:'overview';
+  const [tab,query='']=location.hash.slice(1).split('?');activeTab=['overview','exposure','emergence','warning','historical'].includes(tab)?tab:'overview';
   document.body.dataset.page=activeTab;
   document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!==activeTab);
   document.querySelectorAll('[data-tab]').forEach(a=>{const current=a.dataset.tab===activeTab;a.classList.toggle('active',current);if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const basinParam=new URLSearchParams(query).get('basin'),requested=Number(basinParam);if(requested&&basins.has(requested)&&requested!==selected)selectBasin(requested,false);
-  if(activeTab==='basins'&&basinParam!==null&&!basins.has(requested))$('lookupStatus').textContent='The linked basin is outside the study domain. The report below retains the previous valid selection; search for a study basin.';
   if(new URLSearchParams(query).get('view')==='basin')openBasinDetail();
   if(activeTab==='historical')initRaster();
-  if(window.ReaderCompanion)window.ReaderCompanion.sync();
   hideTip();
 }
 function downloadText(name,text,type='text/plain'){
@@ -263,7 +260,7 @@ async function init(){
     for(const prefix of ['toe','warning']){$(prefix+'Basin').addEventListener('change',e=>selectBasin(Number(e.target.value)));$(prefix+'Example').addEventListener('click',()=>selectBasin(118));}
     window.addEventListener('hashchange',activate);window.addEventListener('scroll',hideTip,{passive:true});
     // One handler also covers generated report links and browser history.
-    document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const hash=a.getAttribute('href').slice(1),[name,query='']=hash.split('?');if(!['overview','basins','exposure','emergence','warning','historical'].includes(name))return;e.preventDefault();const params=new URLSearchParams(query);if(!params.has('basin'))params.set('basin',selected);history.pushState(null,'',`#${name}?${params}`);activate();$(activeTab).scrollIntoView({block:'start',behavior:'auto'});});
+    document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const hash=a.getAttribute('href').slice(1),[name,query='']=hash.split('?');if(!['overview','exposure','emergence','warning','historical'].includes(name))return;e.preventDefault();const params=new URLSearchParams(query);if(!params.has('basin'))params.set('basin',selected);history.pushState(null,'',`#${name}?${params}`);activate();$(activeTab).scrollIntoView({block:'start',behavior:'auto'});});
     window.addEventListener('popstate',activate);
     document.documentElement.dataset.researchReady='true';window.dispatchEvent(new Event('research-ready'));
 

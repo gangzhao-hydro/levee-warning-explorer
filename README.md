@@ -54,3 +54,9 @@ The two VIC-GPU historical maps now use the verified return-period coordinate se
 The immutable original release is preserved. `deploy/vic2000-correction/` stores exact sparse Float32 updates, with old/new full-grid hashes and patch checksums. `deploy/apply_vic2000.py` reconstructs and checks all 1,866,240,000 base-grid cells, generates lossless COGs and averaged display overviews, and publishes them in a new versioned namespace. Original map chunks remain available. Patch arrays contain only raster indices and corrected depth values, with no local paths or private records. The basin/manuscript data are unchanged.
 
 Maps retain physical water depths. Comparison statistics use the same runoff ≥18.25 mm/year and protection-class <4 screen in both versions, with flooded depth >0.15 m and corrected spherical pixel areas. The underlying VIC simulation and upstream frequency-fit provenance are not newly audited by this packaging step.
+
+## Navigation and warning categories — 29 October 2026
+
+The standalone “Find a basin” page, its navigation links and lookup implementation have been removed. The existing basin inspection, downloads and map interactions within the scientific result pages remain available. Old `#basins` links fall back to the overview.
+
+Warning-category colours follow the current manuscript Figure 4: **Surprise (RET < ToE) is orange; Undetected surprise (RET only) is red**. The website's existing red and orange values are exchanged through the shared category palette, so polygons, legends and category tables stay consistent. All category assignments, counts, data and other colours are unchanged. `tests/reader-navigation.cjs` validates the retained routes and category mappings alongside the existing scientific-data tests.

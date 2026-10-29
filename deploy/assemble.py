@@ -41,6 +41,7 @@ with zipfile.ZipFile(io.BytesIO(corrected)) as archive:
         assert p.parts[0] in {'data','figures','downloads'}
     archive.extractall(output)
 shutil.copytree(ROOT/'site', output, dirs_exist_ok=True)
+(output/'basin-lookup.js').unlink(missing_ok=True)  # Retired standalone basin finder.
 from apply_vic2000 import apply
 apply(output)
 config = json.loads((output/'rasters/native-config.json').read_text())
