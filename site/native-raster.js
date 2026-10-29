@@ -78,7 +78,7 @@ window.NativeFlood = (() => {
     return {tile,factor:fx,rect:[(win[0]*fx-v.x)/v.w*width,(win[1]*fy-v.y)/v.h*height,(win[2]-win[0])*fx/v.w*width,(win[3]-win[1])*fy/v.h*height]};
   }
   async function overviewLayer(layer,yr){
-    const key=`${layer}-${yr}`;if(!previewImages.has(key)){previewImages.set(key,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>{previewImages.delete(key);reject(new Error('Overview unavailable'));};image.src=layer==='population'?'rasters/population.webp':`rasters/${key}.webp`;}));}
+    const key=`${layer}-${yr}`;if(!previewImages.has(key)){previewImages.set(key,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>{previewImages.delete(key);reject(new Error('Overview unavailable'));};image.src=layer==='population'?'rasters/population.webp':`rasters/${key}.webp?v=vic2000-20261029`;}));}
     while(previewImages.size>4)previewImages.delete(previewImages.keys().next().value);
     return previewImages.get(key);
   }
@@ -163,7 +163,7 @@ window.NativeFlood = (() => {
     if(initialized)return;
     initialized=true;
     try{
-      [config,land]=await Promise.all([loadJSON('rasters/native-config.json'),loadJSON('data/land.geojson')]);
+      [config,land]=await Promise.all([loadJSON('rasters/native-config.json?v=vic2000-20261029'),loadJSON('data/land.geojson')]);
       if(config.chunk_manifest)chunkManifest=await loadJSON(config.chunk_manifest);
       const local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
       const url=config.base_url||(local?config.local_base_url:'');baseURL=url?new URL(url.endsWith('/')?url:url+'/',document.baseURI).href:'';

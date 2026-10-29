@@ -1,0 +1,89 @@
+{
+  "version": "vic2000-corrected-lookup-20261029",
+  "source": "VIC GPU historical hindcast",
+  "year": 2000,
+  "source_record": 22,
+  "source_years": [
+    1979,
+    2019
+  ],
+  "description": "Corrected return-period coordinates only, with original linear interpolation, endpoint clamping and flood-side/protected-side partition. No hydrodynamic model rerun. Full physical depths retained.",
+  "axis_old": [
+    0.1,
+    2,
+    5,
+    10,
+    20,
+    50,
+    100,
+    500,
+    1000,
+    5000,
+    10000,
+    100000
+  ],
+  "axis_corrected": [
+    0.1,
+    2,
+    5,
+    10,
+    20,
+    50,
+    100,
+    200,
+    500,
+    1000,
+    10000,
+    100000
+  ],
+  "files": [
+    {
+      "layer": "nolev",
+      "year": 2000,
+      "patch": "nolev-2000-patch.npz",
+      "patch_bytes": 751381,
+      "patch_sha256": "fe2ede97cca73b0d9aa53522e8a54ec97936e87503831e9ef137bf0968b8833c",
+      "changed_pixels": 244480,
+      "old_cog_sha256": "45e80c49a013fa90b08ff0eab6fe7b9fd1d22c6d5e8638882f001281340c38ef",
+      "old_grid_sha256": "7288bfc4e983e40dd4c9d8476cdeb3f2fdcd9b4125760e04d6a0efc9f5e3e8bb",
+      "new_grid_sha256": "d8f096df1c1bcbfd7ac358d87c917c4be506faf9acf2a2015f03a853885ec8c1",
+      "native_width": 43200,
+      "native_height": 21600,
+      "dtype": "float32",
+      "overview_resampling": "average",
+      "maximum_change_point": {
+        "lon": 30.82916666666668,
+        "lat": -22.287499999999994,
+        "row": 13474,
+        "col": 25299,
+        "old_depth_m": 6.3593034744262695,
+        "new_depth_m": 7.085078239440918
+      },
+      "maximum_abs_change_m": 0.7257747650146484
+    },
+    {
+      "layer": "wtlev",
+      "year": 2000,
+      "patch": "wtlev-2000-patch.npz",
+      "patch_bytes": 727036,
+      "patch_sha256": "b55f04995f45bb623db91ade4c0e58df55284c6de859ffa926eca3d17f6c1735",
+      "changed_pixels": 236107,
+      "old_cog_sha256": "4a003aa07aa96c611a1ee381d08bbb2240688c09fc9624a120c55e4228289fd3",
+      "old_grid_sha256": "7c30159957434c957e3e2fb8e122268aa2d6609b4248634ee7c50837bdaf0fd8",
+      "new_grid_sha256": "2875322034e4184a23d2e8181db913e6b535f1fc5330e61073d81592195926a4",
+      "native_width": 43200,
+      "native_height": 21600,
+      "dtype": "float32",
+      "overview_resampling": "average",
+      "maximum_change_point": {
+        "lon": 117.39583333333331,
+        "lat": 24.72083333333333,
+        "row": 7833,
+        "col": 35687,
+        "old_depth_m": 0.0925644040107727,
+        "new_depth_m": 1.5702507495880127
+      },
+      "maximum_abs_change_m": 1.4776864051818848
+    }
+  ]
+}

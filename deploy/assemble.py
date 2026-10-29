@@ -41,6 +41,8 @@ with zipfile.ZipFile(io.BytesIO(corrected)) as archive:
         assert p.parts[0] in {'data','figures','downloads'}
     archive.extractall(output)
 shutil.copytree(ROOT/'site', output, dirs_exist_ok=True)
+from apply_vic2000 import apply
+apply(output)
 config = json.loads((output/'rasters/native-config.json').read_text())
 assert config['years'] == [2000] and config['chunk_manifest']
 assert len(list((output/'data/basins').glob('*.json'))) == 426
@@ -48,7 +50,7 @@ manifest = json.loads((output/config['chunk_manifest']).read_text())
 for filename, entry in manifest['files'].items():
     combined = hashlib.sha256()
     for part in entry['chunks']:
-        data = (output/'rasters/chunks'/part['path']).read_bytes()
+        data = (output/config['base_url']/part['path']).read_bytes()
         assert len(data) == part['bytes']
         assert hashlib.sha256(data).hexdigest() == part['sha256']
         combined.update(data)
