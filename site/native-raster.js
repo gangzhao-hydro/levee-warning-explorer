@@ -117,7 +117,7 @@ window.NativeFlood = (() => {
       if(q!==queryToken||r!==token)return;
       lastPixel={year:yr,longitude:lon,latitude:lat,column_zero_based:ix,row_zero_based:iy,resolution_arcsec:30,nolev_depth_m:values[0],wtlev_depth_m:values[1],difference_nolev_minus_wtlev_m:values[0]-values[1]};
       const show=v=>Number.isFinite(v)?`${v.toFixed(4)} m`:'No data';
-      $('pixelReadout').innerHTML=`<strong>${lon.toFixed(5)}°, ${lat.toFixed(5)}° · ${yr} · original 30″ cell</strong><span>No levees: <b>${show(values[0])}</b> &nbsp; With levees: <b>${show(values[1])}</b> &nbsp; Difference: <b>${show(values[0]-values[1])}</b></span><small>Cell centre · column ${ix}, row ${iy} (zero-based). Values shown to 4 decimal places; the CSV retains the decoded Float32 values.</small>`;
+      $('pixelReadout').innerHTML=`<strong>${lon.toFixed(5)}°, ${lat.toFixed(5)}° · ${yr} · original 30″ cell</strong><span>No levees: <b>${show(values[0])}</b> &nbsp; With levees: <b>${show(values[1])}</b> &nbsp; Difference (no levees − with levees): <b>${show(values[0]-values[1])}</b></span><small>Cell centre · column ${ix}, row ${iy} (zero-based). Values shown to 4 decimal places; the CSV retains the decoded Float32 values.</small>`;
       const marker=$('nativeCrosshair');marker.style.left=(ix+.5-view.x)/view.w*100+'%';marker.style.top=(iy+.5-view.y)/view.h*100+'%';marker.hidden=false;$('downloadPixel').disabled=false;
     }catch(e){if(q===queryToken&&r===token)$('pixelReadout').textContent=`Exact-cell lookup unavailable: ${e.message}`;}
   }
