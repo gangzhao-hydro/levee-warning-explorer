@@ -1,0 +1,42 @@
+{
+  "version": "manuscript-20261107",
+  "description": "Current manuscript Figures 1–4. Lossless WebP conversions preserve every source RGB pixel at full resolution.",
+  "figures": [
+    {
+      "figure": 1,
+      "file": "figure-1.webp",
+      "source_png_sha256": "75e3802d2f9351d01477d2e07fd19af276bafb2c0a383b38778abab071fb7d69",
+      "width": 4320,
+      "height": 3457,
+      "bytes": 597612,
+      "sha256": "15047deaa7a97ec0d8cb2968ebd9c6978f20e9bca3ea29249ebbe754883acc5e"
+    },
+    {
+      "figure": 2,
+      "file": "figure-2.webp",
+      "source_png_sha256": "a35961bfecd469304dd5bae6a70199ace522214b4f6a6b67b90f4d39820f543f",
+      "width": 4320,
+      "height": 4080,
+      "bytes": 2573220,
+      "sha256": "5c0c971036f7354592b7c424dee33828b6585effd1939ae09ef8e63feeecde32"
+    },
+    {
+      "figure": 3,
+      "file": "figure-3.webp",
+      "source_png_sha256": "de0e70cf82727a433dbdf0c19f922a2d44e0f33e5add5769140a59796bff8513",
+      "width": 4320,
+      "height": 5700,
+      "bytes": 884510,
+      "sha256": "e567b3079841607f2fb53dc33e87e0e8efbc67e076b6fc9f949ff658c610a81f"
+    },
+    {
+      "figure": 4,
+      "file": "figure-4.webp",
+      "source_png_sha256": "dc655a1872d9e147c88cc105ddf1d37aa4cec8cd7f1c384d6228d9283abee0f3",
+      "width": 4320,
+      "height": 5700,
+      "bytes": 931708,
+      "sha256": "aee68772dbac5b9567d1df5fe8570f796b4c253a6ce6e77d14140b3eeb2c652e"
+    }
+  ]
+}

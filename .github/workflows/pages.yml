@@ -38,6 +38,8 @@ jobs:
         run: node tests/exceedance-history.cjs _site
       - name: Validate manuscript colour encodings
         run: node tests/manuscript-colours.cjs _site
+      - name: Validate manuscript copy and figure previews
+        run: node tests/manuscript-copy.cjs _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

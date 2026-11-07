@@ -216,7 +216,7 @@ function renderSamples(d,b){
   }
 }
 function renderTimeline(b){
-  $('timelineTitle').textContent=`Basin ${b.basin_id} · one record-exceedance time, two warning sequences`;
+  $('timelineTitle').textContent=`Basin ${b.basin_id} · one shared RET, two warning sequences`;
   const p=chart('timeline',{xmin:2015,xmax:2100,ymax:1,xticks:[2015,2030,2050,2070,2090,2100],yticks:[],height:240,xLabel:'Window start year'});
   for(const [lev,yy] of [['nolev',85],['wtlev',145]]){
     add(p.svg,'line',{x1:p.x(2015),x2:p.x(2100),y1:yy,y2:yy,stroke:'#e1e9eb','stroke-width':3});
