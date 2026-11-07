@@ -179,6 +179,10 @@ def build():
         write(f'basins/{bid}.json', detail)
         ret_checks.append(bid)
 
+    # Keep pre-2015 display windows separate from the unchanged future detection series.
+    from build_exceedance_history import build as build_history
+    build_history(CORRECTED, OUT, DATA / 'exceedance-history.json')
+
     # Current manuscript figures and explicitly named downloads.
     (OUT / 'figures').mkdir(exist_ok=True)
     figure_names = ['Figure_1_Songhua_example_corrected','Figure_2_population_exposure_corrected',

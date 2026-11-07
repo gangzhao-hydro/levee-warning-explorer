@@ -60,3 +60,11 @@ Maps retain physical water depths. Comparison statistics use the same runoff ≥
 The standalone “Find a basin” page, its navigation links and lookup implementation have been removed. The existing basin inspection, downloads and map interactions within the scientific result pages remain available. Old `#basins` links fall back to the overview.
 
 Warning-category colours follow the current manuscript Figure 4: **Surprise (RET < ToE) is orange; Undetected surprise (RET only) is red**. The website's existing red and orange values are exchanged through the shared category palette, so polygons, legends and category tables stay consistent. All category assignments, counts, data and other colours are unchanged. `tests/reader-navigation.cjs` validates the retained routes and category mappings alongside the existing scientific-data tests.
+
+## Full-period exceedance display — 7 November 2026
+
+The basin exceedance chart now shares Figure 1c's 1970–2100 record and percent units. Complete ten-year window starts span 1970–2091. Starts in 1970–2005 are historical only; starts in 2006–2014 cross the historical/SSP5-8.5 boundary and are identified as context, not detection candidates. The ToE search remains restricted to starts in 2015–2091.
+
+`site/data/exceedance-history.json` adds only the 45 pre-2015 window starts for all 426 basins. Existing future basin series, thresholds, ToE, RET, scenarios, downloads, map data, and original release assets are preserved. Rates are calculated from the original unrounded area CSVs, not the rounded browser samples. The builder checks all 65,604 future rate values, 852 ToE timings, 426 RET timings, and all 244 Figure 1c values before writing the display-only asset. Source hashes accompany that asset.
+
+Rebuild with `python deploy/build_exceedance_history.py --corrected <verified-corrected-root> --site <assembled-site> --output site/data/exceedance-history.json`. `deploy/build_corrected_data.py` also calls this builder. Validate the assembled site with `node tests/exceedance-history.cjs _site`.

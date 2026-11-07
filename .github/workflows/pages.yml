@@ -34,6 +34,8 @@ jobs:
         run: python3 tests/scientific-data.py _site
       - name: Validate navigation and warning colours
         run: node tests/reader-navigation.cjs _site
+      - name: Validate full-period frequency display
+        run: node tests/exceedance-history.cjs _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

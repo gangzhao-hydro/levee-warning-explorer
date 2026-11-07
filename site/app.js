@@ -9,6 +9,11 @@ let study, exposure, geometries, land, basins, activeTab='overview', selected=11
 const mapViews={toe:[0,14,1000,410],warning:[0,14,1000,410]};
 let suppressMapClick=false;
 const details = new Map();
+let exceedanceHistoryPromise;
+function loadExceedanceHistory(){
+  if(!exceedanceHistoryPromise)exceedanceHistoryPromise=json('data/exceedance-history.json').catch(error=>{exceedanceHistoryPromise=null;throw error;});
+  return exceedanceHistoryPromise;
+}
 const fmt = (v,n=0) => v === null || !Number.isFinite(v) ? 'Not detected' : v.toLocaleString('en-US',{maximumFractionDigits:n,minimumFractionDigits:n});
 const year = v => v === null ? 'Not detected by 2100' : String(v);
 const signed = v => v === null ? 'Not defined' : `${v>0?'+':''}${v} years`;
@@ -124,17 +129,29 @@ async function loadDetail(b){
   const token=++detailToken;$('rateLoading').textContent=`Loading basin ${b.basin_id}…`;$('rateChart').replaceChildren();
   if($('sampleNo'))$('sampleNo').replaceChildren();if($('sampleWith'))$('sampleWith').replaceChildren();
   try{if(!details.has(b.basin_id))details.set(b.basin_id,await json(`data/basins/${b.basin_id}.json`));if(token!==detailToken)return;
-    const d=details.get(b.basin_id);renderRates(d,b);renderSamples(d,b);$('rateLoading').textContent=`Basin ${b.basin_id} · 11 models`;
+    const d=details.get(b.basin_id),history=await loadExceedanceHistory();if(token!==detailToken)return;renderRates(d,b,history);renderSamples(d,b);$('rateLoading').textContent=`Basin ${b.basin_id} · 11 models`;
   }catch(e){if(token===detailToken)$('rateLoading').textContent=`Could not load basin data. Select a basin to retry. ${e.message}`;}
 }
-function renderRates(d,b){
-  const p=chart('rateChart',{xmin:2015,xmax:2100,ymax:Math.min(1,Math.max(.2,...d.nolev.rates,...d.wtlev.rates)*1.12),xticks:[2015,2030,2050,2070,2090,2100],yLabel:'Exceedance frequency',xLabel:'10-year window start'});
+function renderRates(d,b,history){
+  const h=history.basins[String(d.basin_id)];
+  if(!h || h.p95_km2!==d.p95_km2 || history.data_version!==study.version)throw new Error('Historical display data do not match the basin series.');
+  const years=[...history.rate_years,...d.rate_years],rates={};
+  for(const lev of ['nolev','wtlev'])rates[lev]=[...h[lev],...d[lev].rates].map(v=>v*100);
+  const ymax=Math.min(100,Math.max(20,d.detection_rate*100,...rates.nolev,...rates.wtlev)*1.12);
+  const p=chart('rateChart',{xmin:1970,xmax:2100,ymax,xticks:[1970,1990,2015,2030,2050,2070,2090,2100],yLabel:'Exceedance frequency (%)',xLabel:'10-year window start'});
+  add(p.svg,'rect',{x:p.x(1970),y:p.top,width:p.x(2015)-p.x(1970),height:p.height-p.top-p.bottom,fill:'#e8eff1',opacity:.48,'data-period':'pre-detection'});
+  add(p.svg,'rect',{x:p.x(2006),y:p.top,width:p.x(2015)-p.x(2006),height:p.height-p.top-p.bottom,fill:'#e5cba0',opacity:.35,'data-period':'boundary-spanning'});
   for(const lev of ['nolev','wtlev'])band(p,b['toe_'+lev],C[lev]);
-  for(const [v,color,dash] of [[d.hist_rate,'#9eaeb1','3 5'],[d.detection_rate,'#8065ab','4 4']])add(p.svg,'line',{x1:p.x(2015),x2:p.x(2100),y1:p.y(v),y2:p.y(v),stroke:color,'stroke-dasharray':dash});
-  add(p.svg,'text',{x:p.x(2099),y:p.y(d.detection_rate)-6,'text-anchor':'end',style:'fill:#8065ab'},`Target ${d.detection_rate.toFixed(3)}`);
+  for(const [v,color,dash] of [[d.hist_rate,'#9eaeb1','3 5'],[d.detection_rate,'#8065ab','4 4']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(v*100),y2:p.y(v*100),stroke:color,'stroke-dasharray':dash});
+  add(p.svg,'text',{x:p.x(2099),y:p.y(d.detection_rate*100)-6,'text-anchor':'end',style:'fill:#8065ab'},`Target ${(d.detection_rate*100).toFixed(1)}%`);
+  vertical(p,2015,'#87948c');
   for(const lev of ['nolev','wtlev']){
-    line(p,d.rate_years,d[lev].rates,C[lev],{'stroke-dasharray':lev==='wtlev'?'6 4':'none'});
-    d.rate_years.forEach((yr,i)=>{const point=add(p.svg,'circle',{cx:p.x(yr),cy:p.y(d[lev].rates[i]),r:4,fill:C[lev],opacity:0});point.addEventListener('pointermove',e=>tip(e,`${lev==='nolev'?'No levees':'With levees'} · ${yr}–${yr+9}\nExceedance frequency: ${d[lev].rates[i].toFixed(3)}\nDetection target: ${d.detection_rate.toFixed(3)}`));point.addEventListener('pointerleave',hideTip);});
+    line(p,years,rates[lev],C[lev],{'stroke-dasharray':lev==='wtlev'?'6 4':'none','data-series':'pooled-exceedance','data-protection':lev});
+    years.forEach((yr,i)=>{
+      const period=yr<=2005?'Historical window; context only':yr<2015?'Historical / SSP5-8.5 boundary-spanning window; context only':'SSP5-8.5 window; eligible for ToE search';
+      const point=add(p.svg,'circle',{cx:p.x(yr),cy:p.y(rates[lev][i]),r:4,fill:C[lev],opacity:0});
+      point.addEventListener('pointermove',e=>tip(e,`${lev==='nolev'?'No levees':'With levees'} · ${yr}–${yr+9}\nExceedance frequency: ${rates[lev][i].toFixed(2)}%\nDetection target: ${(d.detection_rate*100).toFixed(2)}%\n${period}`));point.addEventListener('pointerleave',hideTip);
+    });
     vertical(p,b['toe_'+lev],C[lev],b['toe_'+lev]!==null?`${lev==='nolev'?'No':'With'}-levee ToE ${b['toe_'+lev]}`:'',lev==='wtlev'?14:0);
   }
 }
