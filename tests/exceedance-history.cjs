@@ -6,7 +6,7 @@ assert.deepEqual(history.rate_years,Array.from({length:45},(_,i)=>1970+i));
 assert.equal(history.data_version,study.version);assert.equal(Object.keys(history.basins).length,426);
 const render=app.slice(app.indexOf('function renderRates('),app.indexOf('function sampleWindow('));
 let config,lines,nodes,tooltip;
-const context={study,C:{nolev:'#267fa0',wtlev:'#bd6843'},chart:(id,c)=>{config=c;return {svg:{},x:x=>x,y:y=>y,top:28,bottom:45,height:320};},
+const context={study,basinColors:{nolev:'#0072b2',wtlev:'#d55e00',target:'#3f3f3f'},chart:(id,c)=>{config=c;return {svg:{},x:x=>x,y:y=>y,top:28,bottom:45,height:320};},
  add:(parent,name,attrs,text)=>{const n={name,attrs,text,events:{},addEventListener(type,fn){this.events[type]=fn;}};nodes.push(n);return n;},
  line:(p,xs,ys,color,extra)=>lines.push({xs,ys,color,extra}),band:()=>{},vertical:()=>{},
  tip:(e,t)=>{tooltip=t;},hideTip:()=>{}};

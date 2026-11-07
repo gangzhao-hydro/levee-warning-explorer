@@ -5,7 +5,7 @@
   <meta name="description" content="Understand how levees affect flood exposure, hazard emergence and warning time across 426 river sub-basins.">
   <meta name="theme-color" content="#ffffff">
   <title>Levees reduce flood exposure but obscure river-flood emergence · Research explorer</title>
-  <link rel="stylesheet" href="styles.css?v=reader1">
+  <link rel="stylesheet" href="styles.css?v=manuscript-colours-20261107">
 </head>
 <body data-page="overview">
 <a class="skip" href="#main">Skip to content</a>
@@ -67,7 +67,7 @@
   <div class="section-title"><div><p class="eyebrow">01 / POPULATION EXPOSURE</p><h2>Lower exposure. A persistent upward trajectory.</h2></div></div>
   <p class="lede">Levees reduce modelled exposure, while warming continues to raise it. Population is held fixed at its 2020 distribution.</p>
   <div class="metrics" id="exposureMetrics"></div>
-  <article class="card"><div class="card-top"><div><h3>Global population exposed to river flooding</h3><p>Annual ensemble mean · share of the fixed 2020 population</p></div><div class="controls"><label>Scenario<select id="scenario"><option value="ssp585">SSP5-8.5</option><option value="ssp245">SSP2-4.5</option><option value="ssp126">SSP1-2.6</option></select></label></div></div><div class="legend"><span><i class="line nolev"></i>No levees</span><span><i class="line wtlev"></i>With levees</span><span>Shading: model range</span></div><svg id="exposureChart" class="chart wide" viewBox="0 0 1040 350" role="img" aria-label="Annual population exposure"></svg><p id="exposureReadout" class="readout" aria-live="polite">Move across the chart to inspect a year.</p><details class="inline-details"><summary>Model details</summary><div class="detail-body"><label class="checkbox"><input id="individualModels" type="checkbox"> Show individual model lines</label><p id="modelCount" class="note"></p></div></details></article>
+  <article class="card"><div class="card-top"><div><h3>Global population exposed to river flooding</h3><p>Annual ensemble mean · share of the fixed 2020 population</p></div><div class="controls"><label>Scenario<select id="scenario"><option value="ssp585">SSP5-8.5</option><option value="ssp245">SSP2-4.5</option><option value="ssp126">SSP1-2.6</option></select></label></div></div><div id="exposureLegend" class="legend" aria-label="Scenario colours and protection line styles"></div><svg id="exposureChart" class="chart wide" viewBox="0 0 1040 350" role="img" aria-label="Annual population exposure"></svg><p id="exposureReadout" class="readout" aria-live="polite">Move across the chart to inspect a year.</p><details class="inline-details"><summary>Model details</summary><div class="detail-body"><label class="checkbox"><input id="individualModels" type="checkbox"> Show individual model lines</label><p id="modelCount" class="note"></p></div></details></article>
   <details class="disclosure" id="exposureSupporting"><summary><span>Methods & supporting results<small>Period means, assumptions and data download</small></span></summary><div class="detail-body">
     <div class="extra-metrics" id="exposureExtraMetrics"></div>
     <div class="two-col"><article class="card"><h3>Period-mean exposure</h3><p class="note">1970–2014 historical; 2061–2100 future. Percent of fixed population.</p><div class="table-scroll"><table id="periodTable"></table></div></article><article class="insight"><h3>Protection shifts the curve downward.</h3><p>It does not eliminate the warming-driven trajectory. Under SSP5-8.5, with-levee exposure reaches <strong>11.14%</strong> in 2100 — approximately <strong>873 million people</strong> under the fixed-population assumption.</p><p class="note">The historical reduction is modelled exposure avoided, not observed damage avoided. Protection standards are held fixed. These are hazard-driven changes, not projections of population growth.</p></article></div>
@@ -133,5 +133,5 @@
 </main>
 <div id="tooltip" role="tooltip" hidden></div>
 <noscript>This explorer requires JavaScript. Source CSV files remain available in the downloads folder.</noscript>
-<script src="vendor/geotiff.js" defer></script><script src="chunked-raster.js" defer></script><script src="native-raster.js?v=vic2000-20261029" defer></script><script src="app.js?v=warning-colours-20261029" defer></script><script src="reader.js?v=warning-colours-20261029" defer></script>
+<script src="vendor/geotiff.js" defer></script><script src="chunked-raster.js" defer></script><script src="native-raster.js?v=vic2000-20261029" defer></script><script src="app.js?v=manuscript-colours-20261107" defer></script><script src="reader.js?v=warning-colours-20261029" defer></script>
 </body></html>

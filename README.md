@@ -68,3 +68,14 @@ The basin exceedance chart now shares Figure 1c's 1970–2100 record and percent
 `site/data/exceedance-history.json` adds only the 45 pre-2015 window starts for all 426 basins. Existing future basin series, thresholds, ToE, RET, scenarios, downloads, map data, and original release assets are preserved. Rates are calculated from the original unrounded area CSVs, not the rounded browser samples. The builder checks all 65,604 future rate values, 852 ToE timings, 426 RET timings, and all 244 Figure 1c values before writing the display-only asset. Source hashes accompany that asset.
 
 Rebuild with `python deploy/build_exceedance_history.py --corrected <verified-corrected-root> --site <assembled-site> --output site/data/exceedance-history.json`. `deploy/build_corrected_data.py` also calls this builder. Validate the assembled site with `node tests/exceedance-history.cjs _site`.
+
+## Manuscript colour alignment — 7 November 2026
+
+Presentation-only alignment with the current Figures 1–3:
+
+- Figure 2 exposure: historical `#000000`; SSP1-2.6 `#0072b2`; SSP2-4.5 `#e69f00`; SSP5-8.5 `#d55e00`. Solid / dashed encodes no / with levees. Historical and future segments retain every original point, with the last historical point bridging the segments. Model ranges stay neutral grey.
+- Figure 3 emergence: 2015–2040 `#d9827a`, 2041–2070 `#e5b55f`, 2071–2099 `#f4e4a6`; non-detection `#ede8e0`; levee-masked `#b7c9db`. The masked colour matches the manuscript's `#b0c4d8` at 90% opacity over `#f0f4f8`. With-levee maps distinguish 107 masked basins from 97 undetected in both states; no-levee non-detection remains 98. Legend counts are derived from the unchanged basin data. Land outside the analysis domain is white.
+- Figure 1 basin views: no levees `#0072b2`, with levees `#d55e00`, RET `#a23b38`, P95 `#d9826b`, detection target `#3f3f3f`.
+- The warning-page category colours, warning curves, historical flood-depth palette, all scientific data, and all calculations are unchanged. Detection-status-only categories without an exact manuscript counterpart retain their existing colours.
+
+`node tests/manuscript-colours.cjs _site` verifies all 426 basin colours and bin counts, boundary values, all three scenarios with model lines on/off, and the unmodified chart data. Existing scientific, navigation, historical-display and raster tests remain required.

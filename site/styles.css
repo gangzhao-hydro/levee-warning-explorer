@@ -167,3 +167,14 @@ body:not([data-page="overview"]) .intro{display:none}.tabs{overflow-x:auto;white
 
 .lookup-forms #pointLookup label{display:flex;flex-direction:column;align-items:stretch;gap:7px}.lookup-forms input:not([type=range]):not([type=checkbox]){font-size:14px}
 @media(max-width:600px){.tabs{display:flex;overflow-x:auto;gap:2px;flex-wrap:nowrap}.tabs a{min-height:44px}.lookup-forms #pointLookup>div{display:grid;grid-template-columns:1fr 1fr}.lookup-forms #pointLookup button{grid-column:1/-1}.lookup-forms input:not([type=range]):not([type=checkbox]){font-size:16px}.reader-page .intro-copy{font-size:14px}}
+
+/* Figure-specific colour semantics; warning-category and historical-map palettes are unchanged. */
+#exposureLegend .protection-no { border-color: #555; }
+#exposureLegend .protection-with { border-color: #555; border-top-style: dashed; }
+#emergence .line.nolev { border-color: #0072b2; }
+#emergence .line.wtlev { border-color: #d55e00; }
+#emergence .line.threshold { border-color: #3f3f3f; }
+#toeMap { background: #f0f4f8; }
+#toeMap .land-path { fill: #fff; stroke: #999; stroke-width: .35; }
+#toeMap .basin-path { stroke: #777; stroke-width: .45; }
+#toeMap .basin-path:hover, #toeMap .basin-path.selected { stroke: #233b43; stroke-width: 1.5; }

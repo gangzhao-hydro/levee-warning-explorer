@@ -2,6 +2,10 @@
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
 const C = {nolev:'#267fa0',wtlev:'#bd6843',ink:'#233b43',teal:'#217b78'};
+// Figure-specific encodings: scenario colour in Fig. 2; protection colour in Fig. 1.
+const scenarioColors = {historical:'#000000',ssp126:'#0072b2',ssp245:'#e69f00',ssp585:'#d55e00'};
+const basinColors = {nolev:'#0072b2',wtlev:'#d55e00',ret:'#a23b38',p95:'#d9826b',target:'#3f3f3f'};
+const toeColors = {early:'#d9827a',mid:'#e5b55f',late:'#f4e4a6',none:'#ede8e0',masked:'#b7c9db'};
 const categories = ['Advance warning','Surprise','Undetected surprise','Emergence without exceedance','Neither'];
 const catColors = {'Advance warning':'#5d9e8c','Surprise':'#bd8d3d','Undetected surprise':'#bb6261','Emergence without exceedance':'#8065ab','Neither':'#c9d3d5'};
 const catShort = {'Advance warning':'Advance warning','Surprise':'Surprise','Undetected surprise':'Undetected surprise','Emergence without exceedance':'Emergence only','Neither':'Neither'};
@@ -47,17 +51,23 @@ function renderExposure(){
   const p=chart('exposureChart',{xmin:1970,xmax:2100,ymin,ymax,xticks:[1970,1990,2015,2040,2060,2080,2100],yLabel:'Population exposed (%)',xLabel:'Year',height:350});
   add(p.svg,'rect',{x:p.x(1970),y:p.top,width:p.x(2015)-p.x(1970),height:350-p.top-p.bottom,fill:'#f0f5f6',opacity:.65});
   for(const lev of ['nolev','wtlev']){
-    const historical=series.historical[lev],future=series[sc][lev];
-    const years=[...historical.years,...future.years],low=[...historical.min,...future.min],high=[...historical.max,...future.max];
-    const area=pathData(years,high,p.x,p.y)+pathData([...years].reverse(),[...low].reverse(),p.x,p.y).replace(/^M/,'L')+'Z';
-    add(p.svg,'path',{d:area,fill:C[lev],opacity:.08,'data-series':'model-range','data-protection':lev});
-    if(modelLines)for(const name of new Set([...historical.model_names,...future.model_names])){
-      const before=historical.models[historical.model_names.indexOf(name)]??historical.years.map(()=>null);
-      const after=future.models[future.model_names.indexOf(name)]??future.years.map(()=>null);
-      line(p,years,[...before,...after],C[lev],{'stroke-width':.6,opacity:.18,'data-series':'model','data-model':name,'data-protection':lev});
+    const historical=series.historical[lev];
+    for(const period of ['historical',sc]){
+      const v=series[period][lev],isFuture=period!=='historical',color=scenarioColors[period];
+      // Carry the last historical point into the future segment so the line stays continuous.
+      const years=isFuture?[historical.years.at(-1),...v.years]:v.years;
+      const values=key=>isFuture?[historical[key].at(-1),...v[key]]:v[key];
+      const low=values('min'),high=values('max');
+      const area=pathData(years,high,p.x,p.y)+pathData([...years].reverse(),[...low].reverse(),p.x,p.y).replace(/^M/,'L')+'Z';
+      add(p.svg,'path',{d:area,fill:'#999999',opacity:.10,'data-series':'model-range','data-protection':lev,'data-scenario':period});
+      if(modelLines)for(const [i,name] of v.model_names.entries()){
+        const hi=historical.model_names.indexOf(name),ys=isFuture?[hi<0?null:historical.models[hi].at(-1),...v.models[i]]:v.models[i];
+        line(p,years,ys,color,{'stroke-width':.6,opacity:.18,'stroke-dasharray':lev==='wtlev'?'7 4':'none','data-series':'model','data-model':name,'data-protection':lev,'data-scenario':period});
+      }
+      line(p,years,values('mean'),color,{'stroke-dasharray':lev==='wtlev'?'7 4':'none','data-series':'ensemble-mean','data-protection':lev,'data-scenario':period});
     }
-    line(p,years,[...historical.mean,...future.mean],C[lev],{'stroke-dasharray':lev==='wtlev'?'7 4':'none','data-series':'ensemble-mean','data-protection':lev});
   }
+  $('exposureLegend').innerHTML=swatch(scenarioColors.historical,'Historical')+swatch(scenarioColors[sc],$('scenario').selectedOptions[0].textContent)+'<span><i class="line protection-no"></i>No levees</span><span><i class="line protection-with"></i>With levees</span><span>Shading: model range</span>';
   vertical(p,2015,'#87948c');
   add(p.svg,'text',{x:p.x(1972),y:42},'Historical baseline');
   add(p.svg,'text',{x:p.x(2017),y:42},$('scenario').selectedOptions[0].textContent);
@@ -90,9 +100,23 @@ function renderDomain(){
 }
 function drawLand(svg){for(const f of land.features)add(svg,'path',{d:geoPath(f.geometry),class:'land-path'});}
 function detection(b){if(b.toe_nolev!==null&&b.toe_wtlev!==null)return 'Both detected';if(b.toe_nolev!==null)return 'Levee-masked';if(b.toe_wtlev!==null)return 'With-levee only';return 'Neither detected';}
-const detectColors={'Both detected':'#5d9e8c','Levee-masked':'#bb6261','With-levee only':'#8065ab','Neither detected':'#c9d3d5'};
-function toeColor(value){if(value===null)return '#c9d3d5';const stops=['#e0f4f3','#a8dfd6','#6ccbbf','#42a9b1','#3e81a4','#526b9c'];return stops[Math.min(5,Math.floor((value-2015)/15))];}
-function mapColor(b,kind){const lev=$(kind==='toe'?'toeLayer':'warningLayer').value;return kind==='toe'?(lev==='detection'?detectColors[detection(b)]:toeColor(b['toe_'+lev])):catColors[b['category_'+lev]];}
+const detectColors={'Both detected':'#5d9e8c','Levee-masked':toeColors.masked,'With-levee only':'#8065ab','Neither detected':toeColors.none};
+function toeColor(value){if(value===null)return toeColors.none;return value<=2040?toeColors.early:value<=2070?toeColors.mid:toeColors.late;}
+function toeMapColor(b,lev){
+  if(lev==='detection')return detectColors[detection(b)];
+  if(lev==='wtlev'&&b.toe_wtlev===null&&b.toe_nolev!==null)return toeColors.masked;
+  return toeColor(b['toe_'+lev]);
+}
+function mapColor(b,kind){const lev=$(kind==='toe'?'toeLayer':'warningLayer').value;return kind==='toe'?toeMapColor(b,lev):catColors[b['category_'+lev]];}
+function toeLegendItems(lev){
+  if(lev==='detection')return Object.entries(detectColors).map(([label,color])=>[color,label]);
+  const count=predicate=>study.basins.filter(predicate).length;
+  const key='toe_'+lev;
+  const items=[[toeColors.early,`Early: 2015–2040 · ${count(b=>b[key]!==null&&b[key]<=2040)}`],[toeColors.mid,`Mid: 2041–2070 · ${count(b=>b[key]!==null&&b[key]>2040&&b[key]<=2070)}`],[toeColors.late,`Late: 2071–2099 · ${count(b=>b[key]!==null&&b[key]>2070)}`]];
+  items.push([toeColors.none,lev==='wtlev'?`Not detected in either state · ${count(b=>b.toe_nolev===null&&b.toe_wtlev===null)}`:`Not detected by 2100 · ${count(b=>b.toe_nolev===null)}`]);
+  if(lev==='wtlev')items.push([toeColors.masked,`Masked by levees · ${count(b=>b.toe_nolev!==null&&b.toe_wtlev===null)}`]);
+  return items;
+}
 function renderMap(kind){
   const svg=$(kind==='toe'?'toeMap':'warningMap');svg.replaceChildren();svg.setAttribute('viewBox',mapViews[kind].join(' '));drawLand(svg);
   for(const lat of [-60,-30,0,30,60])add(svg,'line',{x1:0,x2:1000,y1:(90-lat)*500/180,y2:(90-lat)*500/180,stroke:'#dce7e9','stroke-width':.4,'stroke-dasharray':'3 5'});
@@ -107,7 +131,7 @@ function renderMap(kind){
   }
   const feature=geometries.features.find(f=>f.properties.basin_id===selected);
   if(feature){const {label_lon, label_lat}=feature.properties;const cx=(label_lon+180)*1000/360,cy=(90-label_lat)*500/180;add(svg,'circle',{cx,cy,r:5,fill:'none',stroke:'#233b43','stroke-width':1.4,'pointer-events':'none'});add(svg,'circle',{cx,cy,r:1.5,fill:'#233b43','pointer-events':'none'});}
-  if(kind==='toe')$('toeLegend').innerHTML=$('toeLayer').value==='detection'?Object.entries(detectColors).map(([k,v])=>swatch(v,k)).join(''):[2015,2030,2045,2060,2075,2090].map(v=>swatch(toeColor(v),String(v))).join('')+swatch('#c9d3d5','Not detected by 2100');
+  if(kind==='toe')$('toeLegend').innerHTML=toeLegendItems($('toeLayer').value).map(([color,label])=>swatch(color,label)).join('');
   else $('warningLegend').innerHTML=categories.map(k=>swatch(catColors[k],`${catShort[k]} · ${study.summary[$('warningLayer').value].categories[k]}`)).join('');
 }
 function basinStat(label,value,note,color){return `<div class="basin-stat" style="border-color:${color}"><span>${label}</span><strong>${value}</strong><small>${note}</small></div>`;}
@@ -119,7 +143,7 @@ function selectBasin(id,updateURL=true){
   if(!basins.has(Number(id)))return;
   selected=Number(id);const b=basins.get(selected);
   for(const prefix of ['toe','warning']){$(prefix+'Basin').value=String(id);$(prefix+'BasinMeta').textContent=`Basin ${id} · ${fmt(b.area_km2)} km² · Median protection ${fmt(b.levee_standard_median,1)} years`;}
-  $('toeDetails').innerHTML=basinStat('NO-LEVEE ToE',b.toe_nolev??'Not detected','First qualifying window start',C.nolev)+basinStat('WITH-LEVEE ToE',b.toe_wtlev??'Not detected','First qualifying window start',C.wtlev)+basinStat('PAIRED TIMING SHIFT',b.toe_nolev!==null&&b.toe_wtlev!==null?signed(b.toe_wtlev-b.toe_nolev):'Not defined',detection(b),'#8065ab');
+  $('toeDetails').innerHTML=basinStat('NO-LEVEE ToE',b.toe_nolev??'Not detected','First qualifying window start',basinColors.nolev)+basinStat('WITH-LEVEE ToE',b.toe_wtlev??'Not detected','First qualifying window start',basinColors.wtlev)+basinStat('PAIRED TIMING SHIFT',b.toe_nolev!==null&&b.toe_wtlev!==null?signed(b.toe_wtlev-b.toe_nolev):'Not defined',detection(b),'#8065ab');
   $('warningDetails').innerHTML=basinStat('SHARED PROTECTED-SYSTEM RET',b.ret??'Not detected','Same RET in both comparisons',C.ink)+basinStat('LEAD FROM NO-LEVEE ToE',signed(b.lead_nolev),b.category_nolev,C.nolev)+basinStat('LEAD FROM WITH-LEVEE ToE',signed(b.lead_wtlev),b.category_wtlev,C.wtlev);
   if(updateURL){history.replaceState(null,'',`#${activeTab}?basin=${selected}&view=basin`);openBasinDetail();}
   for(const prefix of ['toe','warning'])$(prefix+'DrilldownTitle').textContent=`Explore basin ${selected}`;
@@ -141,18 +165,18 @@ function renderRates(d,b,history){
   const p=chart('rateChart',{xmin:1970,xmax:2100,ymax,xticks:[1970,1990,2015,2030,2050,2070,2090,2100],yLabel:'Exceedance frequency (%)',xLabel:'10-year window start'});
   add(p.svg,'rect',{x:p.x(1970),y:p.top,width:p.x(2015)-p.x(1970),height:p.height-p.top-p.bottom,fill:'#e8eff1',opacity:.48,'data-period':'pre-detection'});
   add(p.svg,'rect',{x:p.x(2006),y:p.top,width:p.x(2015)-p.x(2006),height:p.height-p.top-p.bottom,fill:'#e5cba0',opacity:.35,'data-period':'boundary-spanning'});
-  for(const lev of ['nolev','wtlev'])band(p,b['toe_'+lev],C[lev]);
-  for(const [v,color,dash] of [[d.hist_rate,'#9eaeb1','3 5'],[d.detection_rate,'#8065ab','4 4']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(v*100),y2:p.y(v*100),stroke:color,'stroke-dasharray':dash});
-  add(p.svg,'text',{x:p.x(2099),y:p.y(d.detection_rate*100)-6,'text-anchor':'end',style:'fill:#8065ab'},`Target ${(d.detection_rate*100).toFixed(1)}%`);
+  for(const lev of ['nolev','wtlev'])band(p,b['toe_'+lev],basinColors[lev]);
+  for(const [v,color,dash] of [[d.hist_rate,'#9eaeb1','3 5'],[d.detection_rate,basinColors.target,'4 4']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(v*100),y2:p.y(v*100),stroke:color,'stroke-dasharray':dash});
+  add(p.svg,'text',{x:p.x(2099),y:p.y(d.detection_rate*100)-6,'text-anchor':'end',style:`fill:${basinColors.target}`},`Target ${(d.detection_rate*100).toFixed(1)}%`);
   vertical(p,2015,'#87948c');
   for(const lev of ['nolev','wtlev']){
-    line(p,years,rates[lev],C[lev],{'stroke-dasharray':lev==='wtlev'?'6 4':'none','data-series':'pooled-exceedance','data-protection':lev});
+    line(p,years,rates[lev],basinColors[lev],{'stroke-dasharray':lev==='wtlev'?'6 4':'none','data-series':'pooled-exceedance','data-protection':lev});
     years.forEach((yr,i)=>{
       const period=yr<=2005?'Historical window; context only':yr<2015?'Historical / SSP5-8.5 boundary-spanning window; context only':'SSP5-8.5 window; eligible for ToE search';
-      const point=add(p.svg,'circle',{cx:p.x(yr),cy:p.y(rates[lev][i]),r:4,fill:C[lev],opacity:0});
+      const point=add(p.svg,'circle',{cx:p.x(yr),cy:p.y(rates[lev][i]),r:4,fill:basinColors[lev],opacity:0});
       point.addEventListener('pointermove',e=>tip(e,`${lev==='nolev'?'No levees':'With levees'} · ${yr}–${yr+9}\nExceedance frequency: ${rates[lev][i].toFixed(2)}%\nDetection target: ${(d.detection_rate*100).toFixed(2)}%\n${period}`));point.addEventListener('pointerleave',hideTip);
     });
-    vertical(p,b['toe_'+lev],C[lev],b['toe_'+lev]!==null?`${lev==='nolev'?'No':'With'}-levee ToE ${b['toe_'+lev]}`:'',lev==='wtlev'?14:0);
+    vertical(p,b['toe_'+lev],basinColors[lev],b['toe_'+lev]!==null?`${lev==='nolev'?'No':'With'}-levee ToE ${b['toe_'+lev]}`:'',lev==='wtlev'?14:0);
   }
 }
 function sampleWindow(p,start,kind,color,labelRow=0){
@@ -176,18 +200,18 @@ function sampleWindowKey(kind,start,color,hatched=false){
 }
 function renderSamples(d,b){
   if(!$('sampleNo')){
-    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas" aria-describedby="sampleNoLegend"></svg><div id="sampleNoLegend" class="legend sample-window-legend" aria-label="No-levee detection window"></div><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95; dotted line: historical no-levee maximum. Blue shading marks the 10-year ToE window. Zero inundation is retained; no missing samples in the corrected series.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas" aria-describedby="sampleWithLegend"></svg><div id="sampleWithLegend" class="legend sample-window-legend" aria-label="With-levee detection windows"></div><p class="note">Orange shading: 10-year ToE window. Purple hatching: shared 10-year RET window. Red dots exceed the historical no-levee maximum; RET requires at least two models within its window. Line: ensemble median. Dashed / dotted lines: historical P95 / maximum.</p></article>';
+    const container=document.createElement('div');container.className='two-col';container.innerHTML='<article class="card"><h3>No-levee flooded-area samples</h3><svg id="sampleNo" class="chart" viewBox="0 0 500 300" role="img" aria-label="No-levee model-year flooded areas" aria-describedby="sampleNoLegend"></svg><div id="sampleNoLegend" class="legend sample-window-legend" aria-label="No-levee detection window"></div><p class="note">Dots: model-years; line: ensemble median. Dashed line: common historical P95; dotted line: historical no-levee maximum. Blue shading marks the 10-year ToE window. Zero inundation is retained; no missing samples in the corrected series.</p></article><article class="card"><h3>With-levee flooded-area samples</h3><svg id="sampleWith" class="chart" viewBox="0 0 500 300" role="img" aria-label="With-levee model-year flooded areas" aria-describedby="sampleWithLegend"></svg><div id="sampleWithLegend" class="legend sample-window-legend" aria-label="With-levee detection windows"></div><p class="note">Orange shading: 10-year ToE window. Red hatching: shared 10-year RET window. Red dots exceed the historical no-levee maximum; RET requires at least two models within its window. Line: ensemble median. Dashed / dotted lines: historical P95 / maximum.</p></article>';
     $('sampleCharts').append(container);
   }
   const ymax=Math.max(...d.nolev.samples_km2.flat().filter(v=>v!==null),...d.wtlev.samples_km2.flat().filter(v=>v!==null))*1.08;
   for(const lev of ['nolev','wtlev']){
     const p=chart(lev==='nolev'?'sampleNo':'sampleWith',{xmin:1970,xmax:2100,ymax,xticks:[1970,2015,2050,2100],width:500,height:300,yLabel:'Flooded area (km²)',xLabel:'Year'});
-    const labels=[sampleWindow(p,b['toe_'+lev],'ToE',C[lev])];
-    if(lev==='wtlev')labels.push(sampleWindow(p,b.ret,'RET','#8065ab',1));
-    $(lev==='nolev'?'sampleNoLegend':'sampleWithLegend').innerHTML=sampleWindowKey('ToE',b['toe_'+lev],C[lev])+(lev==='wtlev'?sampleWindowKey('RET',b.ret,'#8065ab',true):'');
-    d[lev].samples_km2.forEach((model,mi)=>model.forEach((value,i)=>{if(value===null)return;const record=lev==='wtlev'&&d.years[i]>=2015&&value>d.historical_max_km2;const point=add(p.svg,'circle',{cx:p.x(d.years[i]),cy:p.y(value),r:record?1.9:1.1,fill:record?'#bb6261':value>d.p95_km2?C[lev]:'#8e9ea4',opacity:record?.8:.3});add(point,'title',{},`${study.models[mi]}, ${d.years[i]}: ${fmt(value,2)} km²`);}));
-    line(p,d.years,d[lev].median_km2,C[lev],{'stroke-width':1.5});
-    for(const [value,color,dash] of [[d.p95_km2,'#bf9564','5 4'],[d.historical_max_km2,'#77888e','2 3']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(value),y2:p.y(value),stroke:color,'stroke-width':.8,'stroke-dasharray':dash});
+    const labels=[sampleWindow(p,b['toe_'+lev],'ToE',basinColors[lev])];
+    if(lev==='wtlev')labels.push(sampleWindow(p,b.ret,'RET',basinColors.ret,1));
+    $(lev==='nolev'?'sampleNoLegend':'sampleWithLegend').innerHTML=sampleWindowKey('ToE',b['toe_'+lev],basinColors[lev])+(lev==='wtlev'?sampleWindowKey('RET',b.ret,basinColors.ret,true):'');
+    d[lev].samples_km2.forEach((model,mi)=>model.forEach((value,i)=>{if(value===null)return;const record=lev==='wtlev'&&d.years[i]>=2015&&value>d.historical_max_km2;const point=add(p.svg,'circle',{cx:p.x(d.years[i]),cy:p.y(value),r:record?1.9:1.1,fill:record?basinColors.ret:value>d.p95_km2?basinColors[lev]:'#8e9ea4',opacity:record?.8:.3});add(point,'title',{},`${study.models[mi]}, ${d.years[i]}: ${fmt(value,2)} km²`);}));
+    line(p,d.years,d[lev].median_km2,basinColors[lev],{'stroke-width':1.5});
+    for(const [value,color,dash] of [[d.p95_km2,basinColors.p95,'5 4'],[d.historical_max_km2,basinColors.target,'2 3']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(value),y2:p.y(value),stroke:color,'stroke-width':.8,'stroke-dasharray':dash});
     vertical(p,2015,'#8c988f');
     for(const label of labels)if(label)p.svg.append(label);
   }
