@@ -164,7 +164,6 @@ function renderRates(d,b,history){
   const ymax=Math.min(100,Math.max(20,d.detection_rate*100,...rates.nolev,...rates.wtlev)*1.12);
   const p=chart('rateChart',{xmin:1970,xmax:2100,ymax,xticks:[1970,1990,2015,2030,2050,2070,2090,2100],yLabel:'Exceedance frequency (%)',xLabel:'10-year window start'});
   add(p.svg,'rect',{x:p.x(1970),y:p.top,width:p.x(2015)-p.x(1970),height:p.height-p.top-p.bottom,fill:'#e8eff1',opacity:.48,'data-period':'pre-detection'});
-  add(p.svg,'rect',{x:p.x(2006),y:p.top,width:p.x(2015)-p.x(2006),height:p.height-p.top-p.bottom,fill:'#e5cba0',opacity:.35,'data-period':'boundary-spanning'});
   for(const lev of ['nolev','wtlev'])band(p,b['toe_'+lev],basinColors[lev]);
   for(const [v,color,dash] of [[d.hist_rate,'#9eaeb1','3 5'],[d.detection_rate,basinColors.target,'4 4']])add(p.svg,'line',{x1:p.x(1970),x2:p.x(2100),y1:p.y(v*100),y2:p.y(v*100),stroke:color,'stroke-dasharray':dash});
   add(p.svg,'text',{x:p.x(2099),y:p.y(d.detection_rate*100)-6,'text-anchor':'end',style:`fill:${basinColors.target}`},`Target ${(d.detection_rate*100).toFixed(1)}%`);

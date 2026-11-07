@@ -1,22 +1,33 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const root=process.argv[2]||'site',app=fs.readFileSync(root+'/app.js','utf8');
+const html=fs.readFileSync(root+'/index.html','utf8');
+assert(!html.includes('pale gold'));assert(html.includes('Windows starting in 2006–2014 cross the historical / SSP5-8.5 boundary.'));
 const read=p=>JSON.parse(fs.readFileSync(root+'/'+p));
 const study=read('data/study.json'),history=read('data/exceedance-history.json');
 assert.deepEqual(history.rate_years,Array.from({length:45},(_,i)=>1970+i));
 assert.equal(history.data_version,study.version);assert.equal(Object.keys(history.basins).length,426);
 const render=app.slice(app.indexOf('function renderRates('),app.indexOf('function sampleWindow('));
-let config,lines,nodes,tooltip;
+let config,lines,nodes,tooltip,bands,verticals;
 const context={study,basinColors:{nolev:'#0072b2',wtlev:'#d55e00',target:'#3f3f3f'},chart:(id,c)=>{config=c;return {svg:{},x:x=>x,y:y=>y,top:28,bottom:45,height:320};},
  add:(parent,name,attrs,text)=>{const n={name,attrs,text,events:{},addEventListener(type,fn){this.events[type]=fn;}};nodes.push(n);return n;},
- line:(p,xs,ys,color,extra)=>lines.push({xs,ys,color,extra}),band:()=>{},vertical:()=>{},
+ line:(p,xs,ys,color,extra)=>lines.push({xs,ys,color,extra}),band:(p,start,color)=>bands.push({start,color}),vertical:(p,...args)=>verticals.push(args),
  tip:(e,t)=>{tooltip=t;},hideTip:()=>{}};
 vm.createContext(context);vm.runInContext(render,context);
 for(const basin of study.basins){
  const d=read('data/basins/'+basin.basin_id+'.json'),before=JSON.stringify(d);
- context.d=d;context.b=basin;context.h=history;lines=[];nodes=[];
+ context.d=d;context.b=basin;context.h=history;lines=[];nodes=[];bands=[];verticals=[];
  vm.runInContext('renderRates(d,b,h)',context);
  assert.equal(config.xmin,1970);assert.equal(config.xmax,2100);assert(config.yLabel.includes('(%)'));
  assert.equal(lines.length,2);assert.equal(nodes.filter(n=>n.name==='circle').length,244);
+ // Only the gold cross-boundary background is removed; all scientific annotations remain.
+ const rectangles=nodes.filter(n=>n.name==='rect');
+ assert.equal(rectangles.length,1);assert.equal(rectangles[0].attrs['data-period'],'pre-detection');
+ assert.equal(rectangles[0].attrs.fill,'#e8eff1');assert.equal(rectangles[0].attrs.x,1970);assert.equal(rectangles[0].attrs.width,45);
+ assert(!nodes.some(n=>n.attrs['data-period']==='boundary-spanning'||n.attrs.fill==='#e5cba0'));
+ assert.deepEqual(bands.map(x=>x.start),[basin.toe_nolev,basin.toe_wtlev]);
+ assert.deepEqual(verticals.map(x=>x[0]),[2015,basin.toe_nolev,basin.toe_wtlev]);
+ assert.equal(nodes.filter(n=>n.name==='line').length,2);
+ assert(nodes.some(n=>n.name==='text'&&n.text===`Target ${(d.detection_rate*100).toFixed(1)}%`));
  for(const [i,state] of ['nolev','wtlev'].entries()){
   assert.equal(lines[i].xs.length,122);assert.equal(lines[i].xs[0],1970);assert.equal(lines[i].xs.at(-1),2091);
   assert.deepEqual(Array.from(lines[i].ys.slice(45)),d[state].rates.map(v=>100*v));
@@ -51,5 +62,5 @@ for(const basin of study.basins){
  const old=vm.runInContext('loadDetail({basin_id:118})',r),recent=vm.runInContext('loadDetail({basin_id:19})',r);
  resolveHistory(history);await Promise.all([old,recent]);
  assert.deepEqual(rendered,[19]);assert.equal(elements.rateLoading.textContent,'Basin 19 · 11 models');
- console.log('PASS: 426 full-period plots, percent conversion, unchanged future arrays, contextual historical/cross-boundary tooltips, retry/cache and stale-selection protection.');
+ console.log('PASS: yellow band removed in all 426 plots, other annotations preserved, 426 full-period plots, percent conversion, unchanged future arrays, contextual historical/cross-boundary tooltips, retry/cache and stale-selection protection.');
 })().catch(e=>{console.error(e);process.exitCode=1;});
